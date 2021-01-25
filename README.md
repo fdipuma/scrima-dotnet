@@ -4,7 +4,7 @@ Scrima.NET
 Scrima is a .NET library which parses an OData query uri into an object model which can be used to query custom data sources (`IQueryable` or not).
 
 ### Disclaimer and credits
-This project is modified a combination of two existing Open source projects:
+This project is a modified combination of two existing Open source projects:
 - [OpenApiQuery](https://github.com/Danielku15/OpenApiQuery) by [Daniel Kuschny](https://github.com/Danielku15) - MIT
   This early proof of concept project has greatly shown how to convert odata queries into `IQueryable` compatible expression
 - [OpenData.Core](https://github.com/DwaynesWorld/OpenData) by [Kyle Dwayne Thompson](https://github.com/DwaynesWorld)
