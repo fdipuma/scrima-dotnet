@@ -61,6 +61,6 @@ jobs:
           name: nupkg
           path: ./nupkg
       - name: Push to nuget.org
-        run: dotnet nuget push ./nupkg/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_API_KEY
+        run: dotnet nuget push './nupkg/*.nupkg' --source $NUGET_FEED --skip-duplicate --api-key $NUGET_API_KEY
         
     
