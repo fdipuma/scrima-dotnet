@@ -6,6 +6,16 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+  # Official NuGet Feed settings
+  NUGET_FEED: https://api.nuget.org/v3/index.json
+  NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+
+  BUILD_CONFIG: Release
+
 jobs:
   build:
 
@@ -24,6 +34,30 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build -c $BUILD_CONFIG --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test -c $BUILD_CONFIG --no-build --verbosity normal
+    - name: Pack
+      run: dotnet pack -c $BUILD_CONFIG --no-restore --include-symbols --include-source -o ./nupkg
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v2
+      with:    
+        name: nupkg        
+        path: ./nupkg/*.nupkg   
+
+  publish:
+    
+    needs: build
+    if: github.event_name == 'release'    
+    runs-on: ubuntu-latest 
+    
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: nupkg
+          path: ./nupkg
+      - name: Push to nuget.org
+      - run: dotnet nuget push ./nupkg/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_API_KEY
+        
+    
