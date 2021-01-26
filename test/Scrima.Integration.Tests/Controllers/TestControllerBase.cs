@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Scrima.Core.Query;
 using Scrima.EntityFrameworkCore;
-using Scrima.Integration.Tests.Models;
 
 namespace Scrima.Integration.Tests.Controllers
 {
@@ -23,20 +21,14 @@ namespace Scrima.Integration.Tests.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<QueryResultDto<T>>> GetAsync(
+        public async Task<ActionResult<QueryResult<T>>> GetAsync(
             QueryOptions<T> queryOptions,
             CancellationToken cancellationToken)
         {
             var queryResult =
                 await _records.ToQueryResultAsync(queryOptions, GetSearchPredicate() , cancellationToken: cancellationToken);
 
-            var dto = new QueryResultDto<T>
-            {
-                Results = queryResult.Results.ToList(),
-                Count = queryResult.Count
-            };
-
-            return Ok(dto);
+            return Ok(queryResult);
         }
 
         protected abstract Expression<Func<T, string, bool>> GetSearchPredicate();
