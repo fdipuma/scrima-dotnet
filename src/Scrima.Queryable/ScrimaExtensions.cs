@@ -86,12 +86,12 @@ namespace Scrima.Queryable
             return source.Search(queryOptions, searchPredicate);
         }
 
-        private static IQueryable<TSource> Search<TSource>(this IQueryable<TSource> source, ScrimaQueryOptions scrimaQueryOptions, Expression<Func<TSource, string, bool>> searchPredicate)
+        private static IQueryable<TSource> Search<TSource>(this IQueryable<TSource> source, QueryOptions queryOptions, Expression<Func<TSource, string, bool>> searchPredicate)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            if (scrimaQueryOptions == null) throw new ArgumentNullException(nameof(scrimaQueryOptions));
+            if (queryOptions == null) throw new ArgumentNullException(nameof(queryOptions));
 
-            if (scrimaQueryOptions.Search is null || searchPredicate is null)
+            if (queryOptions.Search is null || searchPredicate is null)
                 return source;
             
             // we are transforming a generic expression with two arguments into
@@ -102,19 +102,19 @@ namespace Scrima.Queryable
             // transformed:
             //                var x = "my current search text";
             //                element => element.MyValue.Contains(x);
-            var predicate = ExpressionHelper.BindSecondArgument(searchPredicate, scrimaQueryOptions.Search);
+            var predicate = ExpressionHelper.BindSecondArgument(searchPredicate, queryOptions.Search);
             return source.Where(predicate);
         }
 
         public static IQueryable<TSource> Paginate<TSource>(this IQueryable<TSource> source,
-            ScrimaQueryOptions scrimaQueryOptions)
+            QueryOptions queryOptions)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            if (scrimaQueryOptions == null) throw new ArgumentNullException(nameof(scrimaQueryOptions));
+            if (queryOptions == null) throw new ArgumentNullException(nameof(queryOptions));
 
-            source = source.Skip((int)(scrimaQueryOptions.Skip ?? 0));
+            source = source.Skip((int)(queryOptions.Skip ?? 0));
 
-            var top = scrimaQueryOptions.Top;
+            var top = queryOptions.Top;
             if (top.HasValue)
             {
                 source = source.Take((int)top);

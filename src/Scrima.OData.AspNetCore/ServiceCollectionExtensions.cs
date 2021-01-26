@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Scrima.OData.AspNetCore
@@ -26,6 +27,8 @@ namespace Scrima.OData.AspNetCore
             {
                 services.Configure(configureOptions);
             }
+
+            services.AddTransient<IActionDescriptorProvider, RemoveQueryOptionsActionDescriptorProvider>();
             
             return services;
         }

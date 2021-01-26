@@ -22,7 +22,7 @@ namespace Scrima.Integration.Tests.Controllers
 
         [HttpGet]
         public async Task<ActionResult<QueryResult<T>>> GetAsync(
-            QueryOptions<T> queryOptions,
+            [FromQuery] QueryOptions<T> queryOptions,
             CancellationToken cancellationToken)
         {
             var queryResult =

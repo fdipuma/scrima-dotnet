@@ -1,6 +1,8 @@
+using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.OpenApi.Models;
+using Scrima.Core.Query;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Scrima.OData.Swashbuckle
@@ -17,22 +19,32 @@ namespace Scrima.OData.Swashbuckle
         
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
-            var optionsParameter = context.ApiDescription.ParameterDescriptions.FirstOrDefault(p => p.Type.IsScrimaQueryOptions());
+            var optionsType = OptionsType(context);
 
-            if (optionsParameter is not null)
+            if (optionsType is not null)
             {
-                AddQueryOptions(operation, optionsParameter);
-                operation.RequestBody.Content.Clear();
+                AddQueryOptions(operation, optionsType);
             }
         }
 
-        private void AddQueryOptions(OpenApiOperation operation, ApiParameterDescription apiParameterDescription)
+        private static Type OptionsType(OperationFilterContext context)
+        {
+            if (context.ApiDescription.ActionDescriptor.Properties.TryGetValue("scrima-odata-query", out var queryType))
+            {
+                return queryType as Type;
+            }
+            
+            return context.ApiDescription.ParameterDescriptions
+                .FirstOrDefault(p => p.Type.IsScrimaQueryOptions())?.Type;
+        }
+
+        private void AddQueryOptions(OpenApiOperation operation, Type type)
         {
             var itemTypeOptions = DefaultTypeOptions;
 
             if (_options.ConfigureOptionsPerType is not null)
             {
-                var itemType = apiParameterDescription.Type.GetScrimaQueryOptionsItemType();
+                var itemType = type.GetScrimaQueryOptionsItemType();
 
                 if (itemType is not null)
                 {

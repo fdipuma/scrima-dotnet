@@ -6,10 +6,10 @@ namespace Scrima.Core.Query
     /// <summary>
     /// An object which contains query options
     /// </summary>
-    public class ScrimaQueryOptions
+    public class QueryOptions
     {
         /// <summary>
-        /// Initialises a new instance of the <see cref="ScrimaQueryOptions" /> class.
+        /// Initialises a new instance of the <see cref="QueryOptions" /> class.
         /// </summary>
         /// <param name="edmType"></param>
         /// <param name="filter">Filter query option</param>
@@ -19,7 +19,7 @@ namespace Scrima.Core.Query
         /// <param name="skipToken">Skip token query option</param>
         /// <param name="top">Top query option</param>
         /// <param name="showCount">Show count query option</param>
-        public ScrimaQueryOptions(EdmComplexType edmType, FilterQueryOption filter, OrderByQueryOption orderBy,
+        public QueryOptions(EdmComplexType edmType, FilterQueryOption filter, OrderByQueryOption orderBy,
             string search, long? skip, string skipToken, long? top, bool showCount)
         {
             EdmType = edmType ?? throw new ArgumentNullException(nameof(edmType));
@@ -76,7 +76,7 @@ namespace Scrima.Core.Query
     /// <summary>
     /// An object which contains query options bound to a specific type
     /// </summary>
-    public class QueryOptions<T> : ScrimaQueryOptions
+    public class QueryOptions<T> : QueryOptions
     {
         /// <summary>
         /// Initialises a new instance of the <see cref="QueryOptions{T}" /> class.
@@ -96,11 +96,11 @@ namespace Scrima.Core.Query
         }
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="QueryOptions{T}" /> class using another <see cref="ScrimaQueryOptions" /> as base .
+        /// Initialises a new instance of the <see cref="QueryOptions{T}" /> class using another <see cref="QueryOptions" /> as base .
         /// </summary>
         /// <param name="other">Other options to copy from</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public QueryOptions(ScrimaQueryOptions other) : this(other.EdmType, other.Filter, other.OrderBy,
+        public QueryOptions(QueryOptions other) : this(other.EdmType, other.Filter, other.OrderBy,
             other.Search, other.Skip, other.SkipToken, other.Top, other.ShowCount)
         {
             if (other == null) throw new ArgumentNullException(nameof(other));

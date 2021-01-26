@@ -15,11 +15,11 @@ namespace Scrima.OData
             _typeProvider = new EdmTypeProvider();
         }
         
-        public ScrimaQueryOptions ParseOptions(Type itemType, ODataRawQueryOptions rawQuery, ODataQueryDefaultOptions defaultOptions = null)
+        public QueryOptions ParseOptions(Type itemType, ODataRawQueryOptions rawQuery, ODataQueryDefaultOptions defaultOptions = null)
         {
             var options = ParseInternal(itemType, rawQuery, defaultOptions);
 
-            return Activator.CreateInstance(typeof(QueryOptions<>).MakeGenericType(itemType), options) as ScrimaQueryOptions;
+            return Activator.CreateInstance(typeof(QueryOptions<>).MakeGenericType(itemType), options) as QueryOptions;
         }
 
         public QueryOptions<T> ParseOptions<T>(ODataRawQueryOptions rawQuery, ODataQueryDefaultOptions defaultOptions = null)
@@ -29,7 +29,7 @@ namespace Scrima.OData
             return new QueryOptions<T>(options);
         }
 
-        private ScrimaQueryOptions ParseInternal(Type itemType, ODataRawQueryOptions rawQuery, ODataQueryDefaultOptions defaultOptions)
+        private QueryOptions ParseInternal(Type itemType, ODataRawQueryOptions rawQuery, ODataQueryDefaultOptions defaultOptions)
         {
             if (itemType == null) throw new ArgumentNullException(nameof(itemType));
             if (rawQuery == null) throw new ArgumentNullException(nameof(rawQuery));
@@ -75,7 +75,7 @@ namespace Scrima.OData
             if (defaultOptions?.AlwaysShowCount == true)
                 countOption = true;
 
-            return new ScrimaQueryOptions(
+            return new QueryOptions(
                 modelType,
                 filterOptions,
                 orderByOptions,
