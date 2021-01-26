@@ -67,7 +67,7 @@ namespace Scrima.Queryable.Tests
         [Fact]
         public void Should_filter_on_int_property()
         {
-            var query = new ScrimaQueryOptions<TestModel>(
+            var query = new QueryOptions<TestModel>(
                 _edmType,
                 new FilterQueryOption(
                     new BinaryOperatorNode(
@@ -99,7 +99,7 @@ namespace Scrima.Queryable.Tests
         [Fact]
         public void Should_order_by_asc_on_int_property()
         {
-            var query = new ScrimaQueryOptions<TestModel>(
+            var query = new QueryOptions<TestModel>(
                 _edmType,
                 new FilterQueryOption(null),
                 new OrderByQueryOption(new []

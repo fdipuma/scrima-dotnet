@@ -6,7 +6,7 @@ namespace Scrima.OData.Swashbuckle
     internal static class SwashbuckleHelpers
     {
         private static readonly Type BaseOptionsType = typeof(ScrimaQueryOptions);
-        private static readonly Type GenericOptionsType = typeof(ScrimaQueryOptions<>);
+        private static readonly Type GenericOptionsType = typeof(QueryOptions<>);
         
         public static bool IsScrimaQueryOptions(this Type type)
         {

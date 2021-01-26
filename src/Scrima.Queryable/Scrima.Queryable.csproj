@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Scrima.Core\Scrima.Core.csproj"/>
+    <ProjectReference Include="..\Scrima.Core\Scrima.Core.csproj" />
   </ItemGroup>
 
 </Project>

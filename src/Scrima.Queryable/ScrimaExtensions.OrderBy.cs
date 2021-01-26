@@ -43,8 +43,6 @@ namespace Scrima.Queryable
                 var sortMethod =
                     sortMethodInfo.MakeGenericMethod(source.ElementType, clause.Property.PropertyType.ClrType);
 
-                //source = sortMethod.Invoke(null, new object[] {source, selectorExpression}) as IQueryable<TSource>;
-                
                 // create a new query expression which includes the sort call
                 var queryExpression = Expression.Call(null, sortMethod, source.Expression, selectorExpression);
 

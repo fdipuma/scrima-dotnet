@@ -47,8 +47,7 @@ public class Startup
                     options.AllowSkipToken = type == typeof(BlogPost);
                 };
             });
-        });
-    }
+        }
     
     // ...
 }
@@ -135,4 +134,4 @@ Currently only filtering, ordering and paging are supported, other features like
 | 5.1.8 System Query Option $search                     | Supported                                                                                |
 
 ## Naming
-The name *Scrima* derives from the ancient [Italian sword art](https://en.wikipedia.org/wiki/Italian_martial_arts#Sistema_Scrima)
+The name *Scrima* derives from the ancient [Italian sword art](https://en.wikipedia.org/wiki/Italian_martial_arts#Sistema_Scrima) 

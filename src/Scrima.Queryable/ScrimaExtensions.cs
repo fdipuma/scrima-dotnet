@@ -2,37 +2,34 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Scrima.Core.Query;
-
-[assembly:InternalsVisibleTo("Scrima.EntityFrameworkCore")]
 
 namespace Scrima.Queryable
 {
     public static partial class ScrimaExtensions
     {
-        public static ScrimaQueryResult<T> ToQueryResult<T>(this IQueryable<T> source, ScrimaQueryOptions<T> scrimaQueryOptions, Expression<Func<T, string, bool>> searchPredicate = null)
+        public static QueryResult<T> ToQueryResult<T>(this IQueryable<T> source, QueryOptions<T> queryOptions, Expression<Func<T, string, bool>> searchPredicate = null)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            if (scrimaQueryOptions == null) throw new ArgumentNullException(nameof(scrimaQueryOptions));
+            if (queryOptions == null) throw new ArgumentNullException(nameof(queryOptions));
 
             // The order of applying the items to the IQueryable is important
             // 1. apply query and order
-            source = ApplyQuery(source, scrimaQueryOptions, searchPredicate);
+            source = ApplyQuery(source, queryOptions, searchPredicate);
 
             // 2. optionally get the count of unfiltered items
             long? count = null;
-            if (scrimaQueryOptions.ShowCount) count = source.LongCount();
+            if (queryOptions.ShowCount) count = source.LongCount();
 
             // 3. apply paging on the sorted and filtered result.
-            source = source.Paginate(scrimaQueryOptions);
+            source = source.Paginate(queryOptions);
 
             // 4. materialize results
             var result = source.ToList();
 
-            return new ScrimaQueryResult<T>(scrimaQueryOptions, result, count);
+            return new QueryResult<T>(result, count);
         }
 
         /// <summary>
@@ -41,7 +38,7 @@ namespace Scrima.Queryable
         /// (e.g. Entity Framework, EF Core, Hibernate). 
         /// </summary>
         /// <param name="source"></param>
-        /// <param name="scrimaQueryOptions"></param>
+        /// <param name="queryOptions"></param>
         /// <param name="toListAsync"></param>
         /// <param name="longCountAsync"></param>
         /// <param name="searchPredicate"></param>
@@ -49,44 +46,44 @@ namespace Scrima.Queryable
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        internal static async Task<ScrimaQueryResult<T>> ToQueryResultInternalAsync<T>(IQueryable<T> source, 
-            ScrimaQueryOptions<T> scrimaQueryOptions,
+        public static async Task<QueryResult<T>> ToQueryResultInternalAsync<T>(IQueryable<T> source, 
+            QueryOptions<T> queryOptions,
             Func<IQueryable<T>, CancellationToken, Task<List<T>>> toListAsync,
             Func<IQueryable<T>, CancellationToken, Task<long>> longCountAsync,
             Expression<Func<T, string, bool>> searchPredicate,
             CancellationToken cancellationToken)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            if (scrimaQueryOptions == null) throw new ArgumentNullException(nameof(scrimaQueryOptions));
+            if (queryOptions == null) throw new ArgumentNullException(nameof(queryOptions));
 
             // The order of applying the items to the IQueryable is important
             // 1. apply query and order
-            source = ApplyQuery(source, scrimaQueryOptions, searchPredicate);
+            source = ApplyQuery(source, queryOptions, searchPredicate);
 
             // 2. optionally get the count of unfiltered items
             long? count = null;
-            if (scrimaQueryOptions.ShowCount) count = await longCountAsync.Invoke(source, cancellationToken);
+            if (queryOptions.ShowCount) count = await longCountAsync.Invoke(source, cancellationToken);
 
             // 3. apply paging on the sorted and filtered result.
-            source = source.Paginate(scrimaQueryOptions);
+            source = source.Paginate(queryOptions);
 
             // 4. materialize results
             var result = await toListAsync.Invoke(source, cancellationToken);
 
-            return new ScrimaQueryResult<T>(scrimaQueryOptions, result, count);
+            return new QueryResult<T>(result, count);
         }
 
-        private static IQueryable<TSource> ApplyQuery<TSource>(IQueryable<TSource> source, ScrimaQueryOptions<TSource> scrimaQueryOptions,
+        private static IQueryable<TSource> ApplyQuery<TSource>(IQueryable<TSource> source, QueryOptions<TSource> queryOptions,
             Expression<Func<TSource, string, bool>> searchPredicate)
         {
             // 1. sort to have the correct order for filtering and limiting
-            source = source.OrderBy(scrimaQueryOptions.OrderBy);
+            source = source.OrderBy(queryOptions.OrderBy);
 
             // 2. filter the items according to the user input
-            source = source.Where(scrimaQueryOptions.Filter);
+            source = source.Where(queryOptions.Filter);
 
             // 3. handle the "search" parameter
-            return source.Search(scrimaQueryOptions, searchPredicate);
+            return source.Search(queryOptions, searchPredicate);
         }
 
         private static IQueryable<TSource> Search<TSource>(this IQueryable<TSource> source, ScrimaQueryOptions scrimaQueryOptions, Expression<Func<TSource, string, bool>> searchPredicate)

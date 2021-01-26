@@ -9,7 +9,7 @@ namespace Scrima.OData.AspNetCore
         {
             var isQueryOptions =
                 bindingContextModelType.IsGenericType &&
-                bindingContextModelType.GetGenericTypeDefinition() == typeof(ScrimaQueryOptions<>);
+                bindingContextModelType.GetGenericTypeDefinition() == typeof(QueryOptions<>);
             
             return isQueryOptions;
         }

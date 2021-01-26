@@ -76,10 +76,10 @@ namespace Scrima.Core.Query
     /// <summary>
     /// An object which contains query options bound to a specific type
     /// </summary>
-    public class ScrimaQueryOptions<T> : ScrimaQueryOptions
+    public class QueryOptions<T> : ScrimaQueryOptions
     {
         /// <summary>
-        /// Initialises a new instance of the <see cref="ScrimaQueryOptions{T}" /> class.
+        /// Initialises a new instance of the <see cref="QueryOptions{T}" /> class.
         /// </summary>
         /// <param name="edmType"></param>
         /// <param name="filter">Filter query option</param>
@@ -89,18 +89,18 @@ namespace Scrima.Core.Query
         /// <param name="skipToken">Skip token query option</param>
         /// <param name="top">Top query option</param>
         /// <param name="showCount"></param>
-        public ScrimaQueryOptions(EdmComplexType edmType, FilterQueryOption filter, OrderByQueryOption orderBy, string search,
+        public QueryOptions(EdmComplexType edmType, FilterQueryOption filter, OrderByQueryOption orderBy, string search,
             long? skip, string skipToken, long? top, bool showCount) : base(edmType, filter, orderBy, search, skip,
             skipToken, top, showCount)
         {
         }
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="ScrimaQueryOptions{T}" /> class using another <see cref="ScrimaQueryOptions" /> as base .
+        /// Initialises a new instance of the <see cref="QueryOptions{T}" /> class using another <see cref="ScrimaQueryOptions" /> as base .
         /// </summary>
         /// <param name="other">Other options to copy from</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public ScrimaQueryOptions(ScrimaQueryOptions other) : this(other.EdmType, other.Filter, other.OrderBy,
+        public QueryOptions(ScrimaQueryOptions other) : this(other.EdmType, other.Filter, other.OrderBy,
             other.Search, other.Skip, other.SkipToken, other.Top, other.ShowCount)
         {
             if (other == null) throw new ArgumentNullException(nameof(other));
