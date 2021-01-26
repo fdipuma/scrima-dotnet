@@ -10,12 +10,15 @@ namespace Scrima.OData.Swashbuckle
         
         public static bool IsODataQuery(this Type type)
         {
-            return OdataBaseOptionsType.IsAssignableFrom(type) || 
-                   (type.IsGenericType && type.GetGenericTypeDefinition() == OdataOptionsType);
+            if (type is null) return false;
+            
+            return OdataBaseOptionsType.IsAssignableFrom(type) || (type.IsGenericType && type.GetGenericTypeDefinition() == OdataOptionsType);
         }
 
         public static Type GetScrimaQueryOptionsItemType(this Type type)
         {
+            if (type is null) return null;
+            
             if (type.IsGenericType && type.GetGenericTypeDefinition() == OdataOptionsType)
             {
                 return type.GetGenericArguments()[0];

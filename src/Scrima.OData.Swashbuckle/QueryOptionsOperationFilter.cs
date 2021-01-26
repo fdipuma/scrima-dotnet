@@ -32,8 +32,7 @@ namespace Scrima.OData.Swashbuckle
                 return queryType as Type;
             }
             
-            return context.ApiDescription.ParameterDescriptions
-                .FirstOrDefault(p => p.Type.IsODataQuery())?.Type;
+            return context.ApiDescription.ParameterDescriptions.FirstOrDefault(p => p.Type.IsODataQuery())?.Type;
         }
 
         private void ChangeQueryOptions(OpenApiOperation operation, Type type)

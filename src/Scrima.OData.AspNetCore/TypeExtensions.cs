@@ -1,5 +1,4 @@
 ﻿using System;
-using Scrima.Core.Query;
 
 namespace Scrima.OData.AspNetCore
 {
@@ -7,11 +6,11 @@ namespace Scrima.OData.AspNetCore
     {
         public static bool IsODataQuery(this Type bindingContextModelType)
         {
-            var isQueryOptions =
+            if (bindingContextModelType is null) return false;
+            
+            return 
                 bindingContextModelType.IsGenericType &&
                 bindingContextModelType.GetGenericTypeDefinition() == typeof(ODataQuery<>);
-            
-            return isQueryOptions;
         }
     }
 }

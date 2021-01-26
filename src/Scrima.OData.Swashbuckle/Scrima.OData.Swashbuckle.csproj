@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <OpenApiGenerateDocuments>false</OpenApiGenerateDocuments>
     <Title>Scrima.NET OData Swagger schema for Swashbuckle</Title>
   </PropertyGroup>
