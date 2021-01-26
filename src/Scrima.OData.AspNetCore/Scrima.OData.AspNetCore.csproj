@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
     <Version>1.0</Version>
+    <Title>Scrima.NET OData parsing for AspNet.Core</Title>
   </PropertyGroup>
 
   <ItemGroup>
