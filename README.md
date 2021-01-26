@@ -55,10 +55,10 @@ public class Startup
 
 ## How to use
 
-In your controller(s), define a Get method which accepts a parameter of `ScrimaQueryOptions<T>`:
+In your controller(s), define a Get method which accepts a parameter of `ODataQuery<T>`:
 
 ```csharp
-public ActionResult GetAll(ScrimaQueryOptions<MyModel> query)
+public ActionResult GetAll(ODataQuery<MyModel> query)
 {
     // Implement query logic.
     

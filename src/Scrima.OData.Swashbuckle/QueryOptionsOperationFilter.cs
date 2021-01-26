@@ -1,8 +1,6 @@
 using System;
 using System.Linq;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.OpenApi.Models;
-using Scrima.Core.Query;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Scrima.OData.Swashbuckle
@@ -23,7 +21,7 @@ namespace Scrima.OData.Swashbuckle
 
             if (optionsType is not null)
             {
-                AddQueryOptions(operation, optionsType);
+                ChangeQueryOptions(operation, optionsType);
             }
         }
 
@@ -35,10 +33,10 @@ namespace Scrima.OData.Swashbuckle
             }
             
             return context.ApiDescription.ParameterDescriptions
-                .FirstOrDefault(p => p.Type.IsScrimaQueryOptions())?.Type;
+                .FirstOrDefault(p => p.Type.IsODataQuery())?.Type;
         }
 
-        private void AddQueryOptions(OpenApiOperation operation, Type type)
+        private void ChangeQueryOptions(OpenApiOperation operation, Type type)
         {
             var itemTypeOptions = DefaultTypeOptions;
 
@@ -53,84 +51,58 @@ namespace Scrima.OData.Swashbuckle
                 }
             }
 
-            if (itemTypeOptions.AllowCount)
-            {
-                operation.Parameters.Add(new OpenApiParameter
-                {
-                    Name = "$count",
-                    In = ParameterLocation.Query,
-                    Schema = new OpenApiSchema {Type = "boolean"},
-                    Description = "Whether to include the total number of items in the result set before paging",
-                });
-            }
+            UpdateParamInfo(operation, "$count", "boolean",
+                "Whether to include the total number of items in the result set before paging",
+                itemTypeOptions.AllowCount);
+            
+            UpdateParamInfo(operation, "$filter", "string",
+                "A filter to select only a subset of the overall results using the OData 4.0 Syntax (http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#_Toc31358948)",
+                itemTypeOptions.AllowFilter);
 
-            if (itemTypeOptions.AllowFilter)
-            {
-                operation.Parameters.Add(new OpenApiParameter
-                {
-                    Name = "$filter",
-                    In = ParameterLocation.Query,
-                    Schema = new OpenApiSchema {Type = "string"},
-                    Description =
-                        "A filter to select only a subset of the overall results using the OData 4.0 Syntax (http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#_Toc31358948)"
-                });
-            }
+            UpdateParamInfo(operation, "$search", "string",
+                "A global text filter applied to multiple properties to select only a subset of the overall results",
+                itemTypeOptions.AllowSearch);
+            
+            UpdateParamInfo(operation, "$orderby", "string",
+                "A comma separated list of properties to sort the result set using the OData 4.0 Syntax (http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#_Toc31358952)",
+                itemTypeOptions.AllowOrderBy);
+            
+            UpdateParamInfo(operation, "$skip", "integer",
+                "The number of items to skip for paging",
+                itemTypeOptions.AllowSkip);
+            
+            UpdateParamInfo(operation, "$skiptoken", "string",
+                "Token used for skipping results",
+                itemTypeOptions.AllowSkipToken);
+            
+            UpdateParamInfo(operation, "$top", "integer",
+                "The number of elements to include from the result set for paging",
+                itemTypeOptions.AllowTop);
+        }
 
-            if (itemTypeOptions.AllowSearch)
+        private static void UpdateParamInfo(OpenApiOperation operation, string paramName, string paramType,
+            string paramDescription, bool isParamAllowed)
+        {
+            var param = operation.Parameters.FirstOrDefault(p => p.Name == paramName);
+            
+            if (isParamAllowed)
             {
-                operation.Parameters.Add(new OpenApiParameter
+                if (param is null)
                 {
-                    Name = "$search",
-                    In = ParameterLocation.Query,
-                    Schema = new OpenApiSchema {Type = "string"},
-                    Description =
-                        "A global text filter applied to multiple properties to select only a subset of the overall results"
-                });
-            }
+                    param = new OpenApiParameter {Name = paramName};
+                    operation.Parameters.Add(param);
+                }
 
-            if (itemTypeOptions.AllowOrderBy)
-            {
-                operation.Parameters.Add(new OpenApiParameter
-                {
-                    Name = "$orderby",
-                    In = ParameterLocation.Query,
-                    Schema = new OpenApiSchema {Type = "string"},
-                    Description =
-                        "A comma separated list of properties to sort the result set using the OData 4.0 Syntax (http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#_Toc31358952)"
-                });
+                param.In = ParameterLocation.Query;
+                param.Schema = new OpenApiSchema {Type = paramType};
+                param.Description = paramDescription;
             }
-
-            if (itemTypeOptions.AllowSkip)
+            else
             {
-                operation.Parameters.Add(new OpenApiParameter
+                if (param is not null)
                 {
-                    Name = "$skip",
-                    In = ParameterLocation.Query,
-                    Schema = new OpenApiSchema {Type = "integer"},
-                    Description = "The number of items to skip for paging"
-                });
-            }
-
-            if (itemTypeOptions.AllowSkipToken)
-            {
-                operation.Parameters.Add(new OpenApiParameter
-                {
-                    Name = "$skiptoken",
-                    In = ParameterLocation.Query,
-                    Schema = new OpenApiSchema {Type = "string"},
-                    Description = "The number of items to skip for paging"
-                });
-            }
-
-            if (itemTypeOptions.AllowTop)
-            {
-                operation.Parameters.Add(new OpenApiParameter
-                {
-                    Name = "$top",
-                    In = ParameterLocation.Query,
-                    Schema = new OpenApiSchema {Type = "integer"},
-                    Description = "The number of elements to include from the result set for paging"
-                });
+                    operation.Parameters.Remove(param);
+                }
             }
         }
     }

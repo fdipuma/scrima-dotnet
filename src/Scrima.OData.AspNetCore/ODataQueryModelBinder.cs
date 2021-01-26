@@ -7,13 +7,13 @@ using Microsoft.Extensions.Options;
 
 namespace Scrima.OData.AspNetCore
 {
-    internal class QueryOptionsModelBinder : IModelBinder
+    internal class ODataQueryModelBinder : IModelBinder
     {
         private readonly IODataRawQueryParser _parser;
-        private readonly ILogger<QueryOptionsModelBinder> _logger;
+        private readonly ILogger<ODataQueryModelBinder> _logger;
         private readonly ODataQueryDefaultOptions _defaultOptions;
 
-        public QueryOptionsModelBinder(IODataRawQueryParser parser, ILogger<QueryOptionsModelBinder> logger, IOptions<ODataQueryDefaultOptions> options)
+        public ODataQueryModelBinder(IODataRawQueryParser parser, ILogger<ODataQueryModelBinder> logger, IOptions<ODataQueryDefaultOptions> options)
         {
             _parser = parser;
             _logger = logger;
@@ -24,7 +24,7 @@ namespace Scrima.OData.AspNetCore
         {
             if (bindingContext == null) throw new ArgumentNullException(nameof(bindingContext));
 
-            if (!bindingContext.ModelType.IsQueryOptions()) return Task.CompletedTask;
+            if (!bindingContext.ModelType.IsODataQuery()) return Task.CompletedTask;
 
             try
             {
@@ -33,8 +33,23 @@ namespace Scrima.OData.AspNetCore
                 var queryModelType = bindingContext.ModelType.GetGenericArguments().First();
 
                 var queryOptions = _parser.ParseOptions(queryModelType, rawQuery, _defaultOptions);
+                
+                var odataQuery = (ODataQuery)Activator.CreateInstance(typeof(ODataQuery<>).MakeGenericType(queryModelType));
 
-                bindingContext.Result = ModelBindingResult.Success(queryOptions);
+                if (odataQuery != null)
+                {
+                    odataQuery.QueryOptions = queryOptions;
+                    odataQuery.Count = queryOptions.ShowCount;
+                    odataQuery.Skip = queryOptions.Skip;
+                    odataQuery.Top = queryOptions.Top;
+
+                    odataQuery.Filter = rawQuery.Filter;
+                    odataQuery.Search = rawQuery.Search;
+                    odataQuery.OrderBy = rawQuery.OrderBy;
+                    odataQuery.SkipToken = rawQuery.SkipToken;
+                }
+
+                bindingContext.Result = ModelBindingResult.Success(odataQuery);
             }
             catch (ODataParseException ex)
             {

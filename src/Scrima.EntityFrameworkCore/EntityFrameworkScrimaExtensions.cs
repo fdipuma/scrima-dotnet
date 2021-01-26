@@ -12,7 +12,7 @@ namespace Scrima.EntityFrameworkCore
     public static class EntityFrameworkScrimaExtensions
     {
         public static async Task<QueryResult<T>> ToQueryResultAsync<T>(this IQueryable<T> source,
-            QueryOptions<T> queryOptions, Expression<Func<T, string, bool>> searchPredicate = null,
+            QueryOptions queryOptions, Expression<Func<T, string, bool>> searchPredicate = null,
             CancellationToken cancellationToken = default)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));

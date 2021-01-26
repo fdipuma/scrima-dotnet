@@ -10,7 +10,7 @@ namespace Scrima.Queryable
 {
     public static partial class ScrimaExtensions
     {
-        public static QueryResult<T> ToQueryResult<T>(this IQueryable<T> source, QueryOptions<T> queryOptions, Expression<Func<T, string, bool>> searchPredicate = null)
+        public static QueryResult<T> ToQueryResult<T>(this IQueryable<T> source, QueryOptions queryOptions, Expression<Func<T, string, bool>> searchPredicate = null)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (queryOptions == null) throw new ArgumentNullException(nameof(queryOptions));
@@ -47,7 +47,7 @@ namespace Scrima.Queryable
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         public static async Task<QueryResult<T>> ToQueryResultInternalAsync<T>(IQueryable<T> source, 
-            QueryOptions<T> queryOptions,
+            QueryOptions queryOptions,
             Func<IQueryable<T>, CancellationToken, Task<List<T>>> toListAsync,
             Func<IQueryable<T>, CancellationToken, Task<long>> longCountAsync,
             Expression<Func<T, string, bool>> searchPredicate,
@@ -73,7 +73,7 @@ namespace Scrima.Queryable
             return new QueryResult<T>(result, count);
         }
 
-        private static IQueryable<TSource> ApplyQuery<TSource>(IQueryable<TSource> source, QueryOptions<TSource> queryOptions,
+        private static IQueryable<TSource> ApplyQuery<TSource>(IQueryable<TSource> source, QueryOptions queryOptions,
             Expression<Func<TSource, string, bool>> searchPredicate)
         {
             // 1. sort to have the correct order for filtering and limiting

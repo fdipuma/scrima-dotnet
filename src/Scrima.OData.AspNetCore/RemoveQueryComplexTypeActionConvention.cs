@@ -10,16 +10,9 @@ namespace Scrima.OData.AspNetCore
         {
             foreach (var actionDescriptor in context.Results)
             {
-                foreach (var param in actionDescriptor.Parameters.Where(p => p.ParameterType.IsQueryOptions()).ToList())
+                foreach (var param in actionDescriptor.Parameters.Where(p => p.ParameterType.IsODataQuery()))
                 {
-                    actionDescriptor.Parameters.Add(new ParameterDescriptor
-                    {
-                        Name = param.Name,
-                        ParameterType = typeof(ODataQueryParams<>).MakeGenericType(param.ParameterType.GetGenericArguments()[0]),
-                        BindingInfo = new BindingInfo { BindingSource = BindingSource.Special },
-                    });
                     actionDescriptor.Properties["scrima-odata-query"] = param.ParameterType;
-                    actionDescriptor.Parameters.Remove(param);
                 }
             }
         }

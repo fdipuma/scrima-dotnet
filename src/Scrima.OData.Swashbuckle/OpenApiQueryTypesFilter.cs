@@ -9,7 +9,7 @@ namespace Scrima.OData.Swashbuckle
     {
         public void Apply(OpenApiSchema schema, SchemaFilterContext context)
         {
-            if (context.Type.IsScrimaQueryOptions())
+            if (context.Type.IsODataQuery())
             {
                 schema.Extensions["odata-schema"] = new OpenApiBoolean(true);
             }

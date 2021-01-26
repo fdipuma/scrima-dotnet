@@ -10,9 +10,9 @@ namespace Scrima.OData.AspNetCore
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            if (context.Metadata.ModelType.IsQueryOptions())
+            if (context.Metadata.ModelType.IsODataQuery())
             {
-                return new BinderTypeModelBinder(typeof(QueryOptionsModelBinder));
+                return new BinderTypeModelBinder(typeof(ODataQueryModelBinder));
             }
 
             return null;

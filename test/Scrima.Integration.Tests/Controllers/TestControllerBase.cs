@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Scrima.Core.Query;
 using Scrima.EntityFrameworkCore;
+using Scrima.OData.AspNetCore;
 
 namespace Scrima.Integration.Tests.Controllers
 {
@@ -22,7 +23,7 @@ namespace Scrima.Integration.Tests.Controllers
 
         [HttpGet]
         public async Task<ActionResult<QueryResult<T>>> GetAsync(
-            [FromQuery] QueryOptions<T> queryOptions,
+            [FromQuery] ODataQuery<T> queryOptions,
             CancellationToken cancellationToken)
         {
             var queryResult =

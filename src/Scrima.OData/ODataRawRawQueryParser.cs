@@ -17,16 +17,7 @@ namespace Scrima.OData
         
         public QueryOptions ParseOptions(Type itemType, ODataRawQueryOptions rawQuery, ODataQueryDefaultOptions defaultOptions = null)
         {
-            var options = ParseInternal(itemType, rawQuery, defaultOptions);
-
-            return Activator.CreateInstance(typeof(QueryOptions<>).MakeGenericType(itemType), options) as QueryOptions;
-        }
-
-        public QueryOptions<T> ParseOptions<T>(ODataRawQueryOptions rawQuery, ODataQueryDefaultOptions defaultOptions = null)
-        {
-            var options = ParseInternal(typeof(T), rawQuery, defaultOptions);
-
-            return new QueryOptions<T>(options);
+            return ParseInternal(itemType, rawQuery, defaultOptions);
         }
 
         private QueryOptions ParseInternal(Type itemType, ODataRawQueryOptions rawQuery, ODataQueryDefaultOptions defaultOptions)
