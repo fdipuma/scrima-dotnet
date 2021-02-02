@@ -55,6 +55,7 @@ namespace Scrima.Queryable.Tests
                         new NestedModel { Id = 5, Name = "Element 5" }
                     },
                     NestedModel = new NestedModel { Id = 97, Name = "Element 97"},
+                    EnumValue = TestEnum.SecondValue,
                     OptionalDate = new DateTimeOffset(2021, 01, 01, 0, 0,0, TimeSpan.Zero)
                 }
             };
@@ -97,6 +98,78 @@ namespace Scrima.Queryable.Tests
         }
 
         [Fact]
+        public void Should_filter_on_eunm_property_when_input_is_int()
+        {
+            var query = new QueryOptions(
+                _edmType,
+                new FilterQueryOption(
+                    new BinaryOperatorNode(
+                        new PropertyAccessNode(
+                                new[]
+                                {
+                                    new EdmProperty(nameof(TestModel.EnumValue), new EdmEnumType(typeof(TestEnum), new []
+                                    {
+                                        new EdmEnumMember("FirstValue", 0),
+                                        new EdmEnumMember("SecondValue", 1)
+                                    }), _edmType)
+                                }
+                            ),
+                        BinaryOperatorKind.Equal,
+                        new ConstantNode(EdmPrimitiveType.Int32, "1", 1))
+                    ),
+                new OrderByQueryOption(Enumerable.Empty<OrderByProperty>()),
+                null,
+                0,
+                null,
+                10,
+                true
+            );
+
+            var results = _queryable.ToQueryResult(query);
+
+            results.Results.Should().ContainSingle();
+            results.Count.Should().Be(1);
+            var value = results.Results.First();
+            value.EnumValue.Should().Be(TestEnum.SecondValue);
+        }
+
+        [Fact]
+        public void Should_filter_on_eunm_property_when_input_is_string()
+        {
+            var query = new QueryOptions(
+                _edmType,
+                new FilterQueryOption(
+                    new BinaryOperatorNode(
+                        new PropertyAccessNode(
+                                new[]
+                                {
+                                    new EdmProperty(nameof(TestModel.EnumValue), new EdmEnumType(typeof(TestEnum), new []
+                                    {
+                                        new EdmEnumMember("FirstValue", 0),
+                                        new EdmEnumMember("SecondValue", 1)
+                                    }), _edmType)
+                                }
+                            ),
+                        BinaryOperatorKind.Equal,
+                        new ConstantNode(EdmPrimitiveType.String, "SecondValue", "SecondValue"))
+                    ),
+                new OrderByQueryOption(Enumerable.Empty<OrderByProperty>()),
+                null,
+                0,
+                null,
+                10,
+                true
+            );
+
+            var results = _queryable.ToQueryResult(query);
+
+            results.Results.Should().ContainSingle();
+            results.Count.Should().Be(1);
+            var value = results.Results.First();
+            value.EnumValue.Should().Be(TestEnum.SecondValue);
+        }
+
+        [Fact]
         public void Should_order_by_asc_on_int_property()
         {
             var query = new QueryOptions(
@@ -126,6 +199,7 @@ namespace Scrima.Queryable.Tests
             public string Name { get; set; }
             public DateTimeOffset? OptionalDate { get; set; }
             public decimal Price { get; set; }
+            public TestEnum EnumValue { get; set; }
             public NestedModel NestedModel { get; set; }
             public IEnumerable<NestedModel> NestedList { get; set; }
         }
@@ -134,6 +208,11 @@ namespace Scrima.Queryable.Tests
         {
             public int Id { get; set; }
             public string Name { get; set; }
+        }
+        public enum TestEnum
+        {
+            FirstValue,
+            SecondValue
         }
     }
 }

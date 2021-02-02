@@ -54,6 +54,21 @@ namespace Scrima.Queryable
                 return Expression.Convert(toPromote, otherType);
             }
 
+            if (toPromote.Type == typeof(string))
+            {
+                if (otherType.IsEnum)
+                {
+                    if (toPromote is ConstantExpression constant)
+                    {
+                        var stringValue = (string)constant.Value;
+                        
+                        var enumValue = Enum.Parse(otherType, stringValue, true);
+                        
+                        return Expression.Constant(enumValue);
+                    }
+                }
+            }
+
             if (toPromote.Type == typeof(sbyte))
             {
                 if (otherType == typeof(short) ||
@@ -114,7 +129,8 @@ namespace Scrima.Queryable
                 if (otherType == typeof(long) ||
                     otherType == typeof(float) ||
                     otherType == typeof(double) ||
-                    otherType == typeof(decimal))
+                    otherType == typeof(decimal) ||
+                    otherType.IsEnum)
                 {
                     return Expression.Convert(toPromote, otherType);
                 }
