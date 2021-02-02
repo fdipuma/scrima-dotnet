@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using FluentAssertions;
 using Scrima.Core;
 using Scrima.Core.Model;
@@ -37,11 +38,13 @@ namespace Scrima.Queryable.Tests
                     Id = 7,
                     Name = "Mark",
                     Price = 0,
+                    NullableInt = 2,
                     NestedList = new []
                     {
                         new NestedModel { Id = 2, Name = "Element 2" },
                         new NestedModel { Id = 3, Name = "Element 3" }
                     },
+                    EnumValue = TestEnum.ThirdValue,
                     NestedModel = new NestedModel { Id = 98, Name = "Element 98"},
                 },
                 new TestModel
@@ -98,7 +101,69 @@ namespace Scrima.Queryable.Tests
         }
 
         [Fact]
-        public void Should_filter_on_eunm_property_when_input_is_int()
+        public void Should_filter_on_nullable_int_property()
+        {
+            var query = new QueryOptions(
+                _edmType,
+                new FilterQueryOption(
+                    new BinaryOperatorNode(
+                        new PropertyAccessNode(
+                                new[]
+                                {
+                                    new EdmProperty(nameof(TestModel.NullableInt), EdmPrimitiveType.Int32, _edmType)
+                                }
+                            ),
+                        BinaryOperatorKind.Equal,
+                        new ConstantNode(EdmPrimitiveType.Int32, "2", 2))
+                    ),
+                new OrderByQueryOption(Enumerable.Empty<OrderByProperty>()),
+                null,
+                0,
+                null,
+                10,
+                true
+            );
+
+            var results = _queryable.ToQueryResult(query);
+
+            results.Results.Should().ContainSingle();
+            results.Count.Should().Be(1);
+            var value = results.Results.First();
+            value.Id.Should().Be(7);
+        }
+
+        [Fact]
+        public void Should_filter_on_nullable_int_property_when_passing_null()
+        {
+            var query = new QueryOptions(
+                _edmType,
+                new FilterQueryOption(
+                    new BinaryOperatorNode(
+                        new PropertyAccessNode(
+                                new[]
+                                {
+                                    new EdmProperty(nameof(TestModel.NullableInt), EdmPrimitiveType.Int32, _edmType)
+                                }
+                            ),
+                        BinaryOperatorKind.Equal,
+                        ConstantNode.Null)
+                    ),
+                new OrderByQueryOption(Enumerable.Empty<OrderByProperty>()),
+                null,
+                0,
+                null,
+                10,
+                true
+            );
+
+            var results = _queryable.ToQueryResult(query);
+
+            results.Results.Should().HaveCount(2);
+            results.Count.Should().Be(2);
+        }
+
+        [Fact]
+        public void Should_filter_on_enum_property_when_input_is_int()
         {
             var query = new QueryOptions(
                 _edmType,
@@ -134,7 +199,7 @@ namespace Scrima.Queryable.Tests
         }
 
         [Fact]
-        public void Should_filter_on_eunm_property_when_input_is_string()
+        public void Should_filter_on_enum_property_when_input_is_string()
         {
             var query = new QueryOptions(
                 _edmType,
@@ -170,6 +235,43 @@ namespace Scrima.Queryable.Tests
         }
 
         [Fact]
+        public void Should_filter_on_enum_property_when_input_is_string_and_enum_member_is_used()
+        {
+            var query = new QueryOptions(
+                _edmType,
+                new FilterQueryOption(
+                    new BinaryOperatorNode(
+                        new PropertyAccessNode(
+                                new[]
+                                {
+                                    new EdmProperty(nameof(TestModel.EnumValue), new EdmEnumType(typeof(TestEnum), new []
+                                    {
+                                        new EdmEnumMember("FirstValue", 0),
+                                        new EdmEnumMember("SecondValue", 1),
+                                        new EdmEnumMember("ThirdValue", 2)
+                                    }), _edmType)
+                                }
+                            ),
+                        BinaryOperatorKind.Equal,
+                        new ConstantNode(EdmPrimitiveType.String, "third", "third"))
+                    ),
+                new OrderByQueryOption(Enumerable.Empty<OrderByProperty>()),
+                null,
+                0,
+                null,
+                10,
+                true
+            );
+
+            var results = _queryable.ToQueryResult(query);
+
+            results.Results.Should().ContainSingle();
+            results.Count.Should().Be(1);
+            var value = results.Results.First();
+            value.EnumValue.Should().Be(TestEnum.ThirdValue);
+        }
+
+        [Fact]
         public void Should_order_by_asc_on_int_property()
         {
             var query = new QueryOptions(
@@ -199,6 +301,7 @@ namespace Scrima.Queryable.Tests
             public string Name { get; set; }
             public DateTimeOffset? OptionalDate { get; set; }
             public decimal Price { get; set; }
+            public int? NullableInt { get; set; }
             public TestEnum EnumValue { get; set; }
             public NestedModel NestedModel { get; set; }
             public IEnumerable<NestedModel> NestedList { get; set; }
@@ -212,7 +315,9 @@ namespace Scrima.Queryable.Tests
         public enum TestEnum
         {
             FirstValue,
-            SecondValue
+            SecondValue,
+            [EnumMember(Value = "third")]
+            ThirdValue
         }
     }
 }
