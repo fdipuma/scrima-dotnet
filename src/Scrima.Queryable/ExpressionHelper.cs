@@ -51,30 +51,25 @@ namespace Scrima.Queryable
             return Promote(toPromote, other.Type);
         }
 
-        private static Expression Promote(Expression toPromote, Type otherType)
+        private static Expression Promote(Expression toPromote, Type otherExpressionType)
         {
-            if (toPromote.Type == otherType)
+            if (toPromote.Type == otherExpressionType)
             {
                 return toPromote;
             }
 
-            var nullableUnderlyingType = Nullable.GetUnderlyingType(otherType);
+            var (toPromotePrimiveType, toPromoteNullableType) = GetUnderlyingType(toPromote.Type);
+            var (otherPrimitiveType, otherNullableType) = GetUnderlyingType(otherExpressionType);
 
-            if (nullableUnderlyingType is not null)
+            var toPromoteIsNullable = toPromoteNullableType is not null;
+            
+            if (toPromote.Type.IsValueType && otherExpressionType == typeof(object) &&
+                toPromoteIsNullable)
             {
-                var expression = Promote(toPromote, nullableUnderlyingType);
-
-                return Expression.Convert(expression, otherType);
+                return Expression.Convert(toPromote, otherExpressionType);
             }
 
-            // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/numeric-conversions#implicit-numeric-conversions
-            if (toPromote.Type.IsValueType && otherType == typeof(object) &&
-                Nullable.GetUnderlyingType(toPromote.Type) is null)
-            {
-                return Expression.Convert(toPromote, otherType);
-            }
-
-            if (toPromote.Type == typeof(string) && otherType.IsEnum)
+            if (toPromotePrimiveType == typeof(string) && otherPrimitiveType.IsEnum)
             {
                 if (toPromote is ConstantExpression constant) // we can promote only ConstantsExpressions from string
                 {
@@ -85,129 +80,167 @@ namespace Scrima.Queryable
 
                     var stringValue = (string)constant.Value;
 
-                    var enumValue = ParseEnum(otherType, stringValue);
+                    var enumValue = ParseEnum(otherPrimitiveType, stringValue);
 
                     return Expression.Constant(enumValue);
                 }
             }
 
-            if (toPromote.Type == typeof(sbyte))
+            if (toPromotePrimiveType == typeof(DateTime) && otherPrimitiveType == typeof(DateTimeOffset))
             {
-                if (otherType == typeof(short) ||
-                    otherType == typeof(int) ||
-                    otherType == typeof(long) ||
-                    otherType == typeof(float) ||
-                    otherType == typeof(double) ||
-                    otherType == typeof(decimal))
+                return ConvertExpression(toPromote, toPromoteIsNullable, otherPrimitiveType, otherNullableType);
+            }
+
+            if (toPromotePrimiveType == typeof(sbyte))
+            {
+                if (otherPrimitiveType == typeof(short) ||
+                    otherPrimitiveType == typeof(int) ||
+                    otherPrimitiveType == typeof(long) ||
+                    otherPrimitiveType == typeof(float) ||
+                    otherPrimitiveType == typeof(double) ||
+                    otherPrimitiveType == typeof(decimal))
                 {
-                    return Expression.Convert(toPromote, otherType);
+                    return ConvertExpression(toPromote, toPromoteIsNullable, otherPrimitiveType, otherNullableType);
                 }
             }
 
-            if (toPromote.Type == typeof(byte))
+            if (toPromotePrimiveType == typeof(byte))
             {
-                if (otherType == typeof(short) ||
-                    otherType == typeof(ushort) ||
-                    otherType == typeof(int) ||
-                    otherType == typeof(uint) ||
-                    otherType == typeof(long) ||
-                    otherType == typeof(ulong) ||
-                    otherType == typeof(float) ||
-                    otherType == typeof(double) ||
-                    otherType == typeof(decimal))
+                if (otherPrimitiveType == typeof(short) ||
+                    otherPrimitiveType == typeof(ushort) ||
+                    otherPrimitiveType == typeof(int) ||
+                    otherPrimitiveType == typeof(uint) ||
+                    otherPrimitiveType == typeof(long) ||
+                    otherPrimitiveType == typeof(ulong) ||
+                    otherPrimitiveType == typeof(float) ||
+                    otherPrimitiveType == typeof(double) ||
+                    otherPrimitiveType == typeof(decimal))
                 {
-                    return Expression.Convert(toPromote, otherType);
+                    return ConvertExpression(toPromote, toPromoteIsNullable, otherPrimitiveType, otherNullableType);
                 }
             }
 
-            if (toPromote.Type == typeof(short))
+            if (toPromotePrimiveType == typeof(short))
             {
-                if (otherType == typeof(int) ||
-                    otherType == typeof(long) ||
-                    otherType == typeof(float) ||
-                    otherType == typeof(double) ||
-                    otherType == typeof(decimal))
+                if (otherPrimitiveType == typeof(int) ||
+                    otherPrimitiveType == typeof(long) ||
+                    otherPrimitiveType == typeof(float) ||
+                    otherPrimitiveType == typeof(double) ||
+                    otherPrimitiveType == typeof(decimal))
                 {
-                    return Expression.Convert(toPromote, otherType);
+                    return ConvertExpression(toPromote, toPromoteIsNullable, otherPrimitiveType, otherNullableType);
                 }
             }
 
-            if (toPromote.Type == typeof(ushort))
+            if (toPromotePrimiveType == typeof(ushort))
             {
-                if (otherType == typeof(int) ||
-                    otherType == typeof(uint) ||
-                    otherType == typeof(long) ||
-                    otherType == typeof(ulong) ||
-                    otherType == typeof(float) ||
-                    otherType == typeof(double) ||
-                    otherType == typeof(decimal))
+                if (otherPrimitiveType == typeof(int) ||
+                    otherPrimitiveType == typeof(uint) ||
+                    otherPrimitiveType == typeof(long) ||
+                    otherPrimitiveType == typeof(ulong) ||
+                    otherPrimitiveType == typeof(float) ||
+                    otherPrimitiveType == typeof(double) ||
+                    otherPrimitiveType == typeof(decimal))
                 {
-                    return Expression.Convert(toPromote, otherType);
+                    return ConvertExpression(toPromote, toPromoteIsNullable, otherPrimitiveType, otherNullableType);
                 }
             }
 
-            if (toPromote.Type == typeof(int))
+            if (toPromotePrimiveType == typeof(int))
             {
-                if (otherType == typeof(long) ||
-                    otherType == typeof(float) ||
-                    otherType == typeof(double) ||
-                    otherType == typeof(decimal) ||
-                    otherType.IsEnum)
+                if (otherPrimitiveType == typeof(long) ||
+                    otherPrimitiveType == typeof(float) ||
+                    otherPrimitiveType == typeof(double) ||
+                    otherPrimitiveType == typeof(decimal) ||
+                    otherPrimitiveType.IsEnum)
                 {
-                    return Expression.Convert(toPromote, otherType);
+                    return ConvertExpression(toPromote, toPromoteIsNullable, otherPrimitiveType, otherNullableType);
                 }
             }
 
-            if (toPromote.Type == typeof(uint))
+            if (toPromotePrimiveType == typeof(uint))
             {
-                if (otherType == typeof(long) ||
-                    otherType == typeof(ulong) ||
-                    otherType == typeof(float) ||
-                    otherType == typeof(double) ||
-                    otherType == typeof(decimal))
+                if (otherPrimitiveType == typeof(long) ||
+                    otherPrimitiveType == typeof(ulong) ||
+                    otherPrimitiveType == typeof(float) ||
+                    otherPrimitiveType == typeof(double) ||
+                    otherPrimitiveType == typeof(decimal))
                 {
-                    return Expression.Convert(toPromote, otherType);
+                    return ConvertExpression(toPromote, toPromoteIsNullable, otherPrimitiveType, otherNullableType);
                 }
             }
 
-            if (toPromote.Type == typeof(long))
+            if (toPromotePrimiveType == typeof(long))
             {
-                if (otherType == typeof(float) ||
-                    otherType == typeof(double) ||
-                    otherType == typeof(decimal))
+                if (otherPrimitiveType == typeof(float) ||
+                    otherPrimitiveType == typeof(double) ||
+                    otherPrimitiveType == typeof(decimal))
                 {
-                    return Expression.Convert(toPromote, otherType);
+                    return ConvertExpression(toPromote, toPromoteIsNullable, otherPrimitiveType, otherNullableType);
                 }
             }
 
-            if (toPromote.Type == typeof(ulong))
+            if (toPromotePrimiveType == typeof(ulong))
             {
-                if (otherType == typeof(float) ||
-                    otherType == typeof(double) ||
-                    otherType == typeof(decimal))
+                if (otherPrimitiveType == typeof(float) ||
+                    otherPrimitiveType == typeof(double) ||
+                    otherPrimitiveType == typeof(decimal))
                 {
-                    return Expression.Convert(toPromote, otherType);
+                    return ConvertExpression(toPromote, toPromoteIsNullable, otherPrimitiveType, otherNullableType);
                 }
             }
 
-            if (toPromote.Type == typeof(float))
+            if (toPromotePrimiveType == typeof(float))
             {
-                if (otherType == typeof(double) ||
-                    otherType == typeof(decimal))
+                if (otherPrimitiveType == typeof(double) ||
+                    otherPrimitiveType == typeof(decimal))
                 {
-                    return Expression.Convert(toPromote, otherType);
+                    return ConvertExpression(toPromote, toPromoteIsNullable, otherPrimitiveType, otherNullableType);
                 }
             }
 
-            if (toPromote.Type == typeof(double))
+            if (toPromotePrimiveType == typeof(double))
             {
-                if (otherType == typeof(decimal))
+                if (otherPrimitiveType == typeof(decimal))
                 {
-                    return Expression.Convert(toPromote, otherType);
+                    return ConvertExpression(toPromote, toPromoteIsNullable, otherPrimitiveType, otherNullableType);
                 }
+            }
+            
+            if (otherNullableType is not null && toPromotePrimiveType != typeof(object))
+            {
+                // this will promote nullables to the best matching type of nullable (in this case is the same type of the "toPromote" type)
+                
+                toPromoteNullableType ??= typeof(Nullable<>).MakeGenericType(toPromotePrimiveType); 
+                return ConvertExpression(toPromote, toPromoteIsNullable, toPromotePrimiveType, toPromoteNullableType);
             }
 
             return toPromote;
+        }
+
+        private static Expression ConvertExpression(Expression toPromote, bool expressionTypeIsNullable, Type otherType, Type otherNullableType)
+        {
+            if (!expressionTypeIsNullable && otherNullableType is null)
+                return Expression.Convert(toPromote, otherType);
+
+            if (otherNullableType is not null)
+                return Expression.Convert(toPromote, otherNullableType);
+
+            var nullableType = typeof(Nullable<>).MakeGenericType(otherType);
+
+            return Expression.Convert(toPromote, nullableType);
+        }
+
+        private static (Type primitiveType, Type nullableType) GetUnderlyingType(Type type)
+        {
+            var nullableUnderlyingType = Nullable.GetUnderlyingType(type);
+
+            if (nullableUnderlyingType is not null)
+            {
+                return (nullableUnderlyingType, type);
+            }
+
+            return (type, null);
         }
 
         private static object ParseEnum(Type enumType, string value)
@@ -228,7 +261,8 @@ namespace Scrima.Queryable
 
                 var enumMemberAttribute = enumType.GetField(name).GetCustomAttribute<EnumMemberAttribute>();
 
-                if (enumMemberAttribute is not null && string.Equals(value, enumMemberAttribute.Value, StringComparison.OrdinalIgnoreCase))
+                if (enumMemberAttribute is not null && string.Equals(value, enumMemberAttribute.Value,
+                    StringComparison.OrdinalIgnoreCase))
                 {
                     return values.GetValue(index);
                 }
