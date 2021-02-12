@@ -94,7 +94,7 @@ namespace Scrima.Core
                 : null;
 
             var clrTypeProperties = clrType
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .OrderBy(p => p.Name);
 
             var edmProperties = new List<EdmProperty>();

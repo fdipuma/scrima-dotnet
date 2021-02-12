@@ -5,18 +5,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Scrima.Integration.Tests.Models
 {
-    public class User
+    public class User : Person
     {
         [Key]
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-
+        
         public string Username { get; set; }
-
-        public string FirstName { get; set; }
-
-        public string LastName { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }
         

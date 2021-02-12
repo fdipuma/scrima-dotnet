@@ -10,7 +10,7 @@ namespace Scrima.Integration.Tests.Models
         public int Id { get; set; }
 
         public string Title { get; set; }
-
+        
         public string Text { get; set; }
 
         [ForeignKey(nameof(Blog))] public int BlogId { get; set; }

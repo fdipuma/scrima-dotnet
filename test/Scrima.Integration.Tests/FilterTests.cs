@@ -62,6 +62,19 @@ namespace Scrima.Integration.Tests
         }
 
         [Fact]
+        public async Task Should_ReturnFiltered_When_FilteringOnEqualsString_On_Superclass_Property()
+        {
+            const int testUserCount = 10;
+            using var server = SetupSample(CreateUsers(testUserCount));
+            using var client = server.CreateClient();
+
+            var response = await client.GetQueryAsync<User>("/users?$filter=lastname eq 'Smith4'");
+
+            response.Results.Should().ContainSingle();
+            response.Results[0].Username.Should().Be("user4");
+        }
+
+        [Fact]
         public async Task Should_ReturnInverseFiltered_When_FilteringOnEqualsStringAndNegating()
         {
             const int testUserCount = 10;
