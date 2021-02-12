@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -17,7 +18,8 @@ namespace Scrima.Queryable
         /// <param name="filterQueryOption">The filter options to apply</param>
         /// <returns>The filtered data source</returns>
         /// <exception cref="ArgumentNullException">source or filter are null</exception>
-        public static IQueryable<TSource> Where<TSource>(this IQueryable<TSource> source, FilterQueryOption filterQueryOption)
+        public static IQueryable<TSource> Where<TSource>(this IQueryable<TSource> source,
+            FilterQueryOption filterQueryOption)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (filterQueryOption == null) throw new ArgumentNullException(nameof(filterQueryOption));
@@ -41,12 +43,13 @@ namespace Scrima.Queryable
                     CreateValueExpression(valueNode, baseExpression),
 
                 FunctionCallNode functionCall =>
-                    CreateFunctionCallExpression(functionCall.Name, functionCall.Parameters.CreateExpressions(baseExpression)),
+                    CreateFunctionCallExpression(functionCall.Name,
+                        functionCall.Parameters.CreateExpressions(baseExpression)),
 
                 UnaryOperatorNode {OperatorKind: UnaryOperatorKind.Not} unaryOperator =>
                     Expression.Not(CreateExpression(unaryOperator.Operand, baseExpression)),
 
-                BinaryOperatorNode binaryOperator => 
+                BinaryOperatorNode binaryOperator =>
                     CreateBinaryOperatorExpression(binaryOperator, baseExpression),
 
                 _ => throw new QueryOptionsValidationException($"Invalid query {queryNode.Kind}")
@@ -62,12 +65,13 @@ namespace Scrima.Queryable
         /// <param name="binaryOperator">The binary operator node</param>
         /// <param name="baseExpression">Base expression</param>
         /// <returns></returns>
-        private static Expression CreateBinaryOperatorExpression(BinaryOperatorNode binaryOperator, Expression baseExpression)
+        private static Expression CreateBinaryOperatorExpression(BinaryOperatorNode binaryOperator,
+            Expression baseExpression)
         {
             var left = CreateExpression(binaryOperator.Left, baseExpression);
             var right = CreateExpression(binaryOperator.Right, baseExpression);
             var kind = binaryOperator.OperatorKind;
-            
+
             // bitwise operations
             if (kind == BinaryOperatorKind.Or)
                 return Expression.Or(left, right);
@@ -78,11 +82,11 @@ namespace Scrima.Queryable
             // enum.HasFlag()
             if (kind == BinaryOperatorKind.Has)
                 return Expression.Call(null, Methods.HasFlag, left, Expression.Convert(right, typeof(Enum)));
-            
+
             // collection contains
             if (kind == BinaryOperatorKind.In)
                 return CreateFunctionCallExpression("contains", new List<Expression> {right, left});
-            
+
             var expressionType = kind switch
             {
                 // comparison
@@ -92,11 +96,11 @@ namespace Scrima.Queryable
                 BinaryOperatorKind.GreaterThanOrEqual => ExpressionType.GreaterThanOrEqual,
                 BinaryOperatorKind.LessThan => ExpressionType.LessThan,
                 BinaryOperatorKind.LessThanOrEqual => ExpressionType.LessThanOrEqual,
-                
+
                 // additive
                 BinaryOperatorKind.Add => ExpressionType.Add,
                 BinaryOperatorKind.Subtract => ExpressionType.Subtract,
-                
+
                 // multiplicative
                 BinaryOperatorKind.Multiply => ExpressionType.Multiply,
                 BinaryOperatorKind.Divide => ExpressionType.Divide,
@@ -108,7 +112,7 @@ namespace Scrima.Queryable
             // type in both sides of the binary expression
             var promotedLeftExpression = ExpressionHelper.Promote(left, right);
             var promotedRightExpression = ExpressionHelper.Promote(right, left);
-            
+
             return Expression.MakeBinary(expressionType, promotedLeftExpression, promotedRightExpression);
         }
 
@@ -125,13 +129,13 @@ namespace Scrima.Queryable
 
                 case ConstantNode {Value: { }} constant:
                     return Expression.Constant(constant.Value, constant.EdmType.ClrType);
-                
-                case ArrayNode { Value: { }} array:
+
+                case ArrayNode {Value: { }} array:
                     return Expression.Constant(array.Value, array.ArrayClrType);
-                    
+
                 case PropertyAccessNode propertyAccess:
                     var expression = parameterExpression;
-                    
+
                     foreach (var edmProperty in propertyAccess.Properties)
                     {
                         var property = expression.Type.GetProperty(edmProperty.Name);
@@ -141,7 +145,7 @@ namespace Scrima.Queryable
                             throw new QueryOptionsValidationException($"Invalid property name {edmProperty.Name}");
                         }
 
-                        expression = Expression.MakeMemberAccess(expression, property);   
+                        expression = Expression.MakeMemberAccess(expression, property);
                     }
 
                     return expression;
@@ -173,7 +177,7 @@ namespace Scrima.Queryable
             }
 
             Type itemType;
-            
+
             switch (functionName)
             {
                 // string functions
@@ -197,7 +201,8 @@ namespace Scrima.Queryable
                     }
                     else if (arguments[0].Type == StringType)
                     {
-                        return Expression.Call(null, Methods.StringConcat, Expression.NewArrayInit(typeof(object), arguments));
+                        return Expression.Call(null, Methods.StringConcat,
+                            Expression.NewArrayInit(typeof(object), arguments));
                     }
                     else
                     {
@@ -213,9 +218,42 @@ namespace Scrima.Queryable
                     }
                     else if (ReflectionHelper.IsEnumerable(arguments[0].Type, out itemType))
                     {
+                        var sourceArg = arguments[0];
+                        var elementArg = arguments[1];
+
+                        if (itemType != elementArg.Type && (itemType.IsEnum || elementArg.Type.IsEnum))
+                        {
+                            // enum: we need to convert/promote expression to enum types
+
+                            var enumType = itemType.IsEnum ? itemType : elementArg.Type;
+
+                            if (sourceArg is ConstantExpression sourceConstantExpression)
+                            {
+                                var sourceEnumerable = ((IEnumerable)sourceConstantExpression.Value).Cast<object>().ToArray();
+
+                                var enumArray = Array.CreateInstance(enumType, sourceEnumerable.Length);
+
+                                for (var index = 0; index < sourceEnumerable.Length; index++)
+                                {
+                                    var item = sourceEnumerable[index];
+                                    enumArray.SetValue(ExpressionHelper.ToEnumValue(enumType, item), index);
+                                }
+
+                                sourceArg = Expression.Constant(enumArray, enumArray.GetType());
+
+                                itemType = enumType;
+                            }
+                            else if (elementArg is ConstantExpression elementConstantExpression)
+                            {
+                                elementArg =
+                                    Expression.Constant(ExpressionHelper.ToEnumValue(enumType,
+                                        elementConstantExpression.Value));
+                            }
+                        }
+
                         return Expression.Call(null, Methods.EnumerableContains.MakeGenericMethod(itemType),
-                            arguments[0],
-                            arguments[1]);
+                            sourceArg,
+                            elementArg);
                     }
                     else
                     {
@@ -245,7 +283,7 @@ namespace Scrima.Queryable
                     {
                         return InvalidParameterTypes("strings, enumerables");
                     }
-                
+
                 case "startswith":
                     ValidateParameterCount(2);
                     return Expression.Call(arguments[0], Methods.StringStartsWith, arguments[1]);
@@ -353,20 +391,21 @@ namespace Scrima.Queryable
                     {
                         return InvalidParameterTypes("DateTime, DateTimeOffset");
                     }
-                
+
                 case "totaloffsetminutes":
                     ValidateParameterCount(1);
 
                     if (arguments[0].Type == DateTimeOffsetType)
                     {
                         return Expression.MakeMemberAccess(
-                            Expression.MakeMemberAccess(arguments[0], Methods.DateTimeOffsetOffset), Methods.TimeSpanTotalMinutes);
+                            Expression.MakeMemberAccess(arguments[0], Methods.DateTimeOffsetOffset),
+                            Methods.TimeSpanTotalMinutes);
                     }
                     else
                     {
                         return InvalidParameterTypes("DateTimeOffset");
                     }
-                
+
                 case "day":
                     ValidateParameterCount(1);
 
@@ -382,7 +421,7 @@ namespace Scrima.Queryable
                     {
                         return InvalidParameterTypes("DateTime, DateTimeOffset");
                     }
-                
+
                 case "month":
                     ValidateParameterCount(1);
 
@@ -398,7 +437,7 @@ namespace Scrima.Queryable
                     {
                         return InvalidParameterTypes("DateTime, DateTimeOffset");
                     }
-                
+
                 case "year":
                     ValidateParameterCount(1);
 
@@ -414,7 +453,7 @@ namespace Scrima.Queryable
                     {
                         return InvalidParameterTypes("DateTime, DateTimeOffset");
                     }
-                
+
                 case "hour":
                     ValidateParameterCount(1);
 
@@ -430,7 +469,7 @@ namespace Scrima.Queryable
                     {
                         return InvalidParameterTypes("DateTime, DateTimeOffset");
                     }
-                
+
                 case "minute":
                     ValidateParameterCount(1);
 
@@ -446,7 +485,7 @@ namespace Scrima.Queryable
                     {
                         return InvalidParameterTypes("DateTime, DateTimeOffset");
                     }
-                
+
                 case "second":
                     ValidateParameterCount(1);
 
@@ -462,7 +501,7 @@ namespace Scrima.Queryable
                     {
                         return InvalidParameterTypes("DateTime, DateTimeOffset");
                     }
-                
+
                 case "fractionalseconds":
                     ValidateParameterCount(1);
 
@@ -482,11 +521,11 @@ namespace Scrima.Queryable
                 case "maxdatetime":
                     ValidateParameterCount(0);
                     return Expression.Constant(DateTimeOffset.MaxValue);
-                
+
                 case "mindatetime":
                     ValidateParameterCount(0);
                     return Expression.Constant(DateTimeOffset.MinValue);
-                
+
                 case "now":
                     ValidateParameterCount(0);
                     return Expression.Constant(DateTimeOffset.UtcNow);
@@ -507,7 +546,7 @@ namespace Scrima.Queryable
                         ? arguments[0]
                         : Expression.Convert(arguments[0], DoubleType);
                     return Expression.Call(null, Methods.MathFloor, floorArg);
-                
+
                 case "round":
                     ValidateParameterCount(1);
 
@@ -600,7 +639,7 @@ namespace Scrima.Queryable
                 _ => null
             };
         }
-        
+
         private static readonly Type StringType = typeof(string);
         private static readonly Type DoubleType = typeof(double);
         private static readonly Type DateTimeOffsetType = typeof(DateTimeOffset);

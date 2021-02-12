@@ -243,7 +243,16 @@ namespace Scrima.Queryable
             return (type, null);
         }
 
-        private static object ParseEnum(Type enumType, string value)
+        public static object ToEnumValue(Type enumType, object value)
+        {
+            if (value is int) return Enum.ToObject(enumType, value);
+
+            if (value is string stringValue) return ParseEnum(enumType, stringValue);
+
+            return Enum.ToObject(enumType, 0);
+        }
+        
+        public static object ParseEnum(Type enumType, string value)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
 
