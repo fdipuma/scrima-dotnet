@@ -21,6 +21,7 @@ namespace Scrima.OData.Parsers
             ["ne"] = BinaryOperatorKind.NotEqual,
             ["or"] = BinaryOperatorKind.Or,
             ["sub"] = BinaryOperatorKind.Subtract,
+            ["in"] = BinaryOperatorKind.In
         };
 
         internal static BinaryOperatorKind ToBinaryOperatorKind(this string operatorType)

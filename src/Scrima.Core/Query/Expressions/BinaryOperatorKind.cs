@@ -79,5 +79,10 @@
         /// The binary operator is has.
         /// </summary>
         Has = 14,
+
+        /// <summary>
+        /// The binary operator is in.
+        /// </summary>
+        In = 15
     }
 }

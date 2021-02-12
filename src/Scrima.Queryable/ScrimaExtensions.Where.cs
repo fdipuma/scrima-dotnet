@@ -79,6 +79,10 @@ namespace Scrima.Queryable
             if (kind == BinaryOperatorKind.Has)
                 return Expression.Call(null, Methods.HasFlag, left, Expression.Convert(right, typeof(Enum)));
             
+            // collection contains
+            if (kind == BinaryOperatorKind.In)
+                return CreateFunctionCallExpression("contains", new List<Expression> {right, left});
+            
             var expressionType = kind switch
             {
                 // comparison
@@ -121,7 +125,10 @@ namespace Scrima.Queryable
 
                 case ConstantNode {Value: { }} constant:
                     return Expression.Constant(constant.Value, constant.EdmType.ClrType);
-
+                
+                case ArrayNode { Value: { }} array:
+                    return Expression.Constant(array.Value, array.ArrayClrType);
+                    
                 case PropertyAccessNode propertyAccess:
                     var expression = parameterExpression;
                     

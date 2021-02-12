@@ -113,6 +113,20 @@ namespace Scrima.Integration.Tests
         }
 
         [Fact]
+        public async Task Should_ReturnFiltered_When_FilteringOnArrayContains()
+        {
+            const int testUserCount = 10;
+            using var server = SetupSample(CreateUsers(testUserCount));
+            using var client = server.CreateClient();
+
+            var response = await client.GetQueryAsync<User>("/users?$filter=username in ('user4', 'user5')");
+
+            response.Results.Should().HaveCount(2);
+            response.Results[0].Username.Should().Be("user4");
+            response.Results[1].Username.Should().Be("user5");
+        }
+
+        [Fact]
         public async Task Should_ReturnFiltered_When_FilteringOnIntLessGreaterThan()
         {
             const int testUserCount = 10;

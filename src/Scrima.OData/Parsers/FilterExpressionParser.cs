@@ -233,6 +233,7 @@ namespace Scrima.OData.Parsers
                             break;
 
                         case TokenType.FunctionName:
+                           
                             if (leftNode == null)
                             {
                                 leftNode = new FunctionCallNode(token.Value);
@@ -272,7 +273,23 @@ namespace Scrima.OData.Parsers
                         case TokenType.String:
                         case TokenType.TimeOfDay:
                         case TokenType.True:
-                            rightNode = ConstantNodeParser.ParseConstantNode(token, _typeProvider);
+                            var constantNode = ConstantNodeParser.ParseConstantNode(token, _typeProvider);
+
+                            if (rightNode is ConstantNode existingConstant)
+                            {
+                                var arrayNode = ConstantNode.Array(existingConstant);
+                                arrayNode.AddElement(constantNode);
+                                rightNode = arrayNode;
+                            }
+                            else if (rightNode is ArrayNode arrayNode)
+                            {
+                                arrayNode.AddElement(constantNode);
+                            }
+                            else
+                            {
+                                rightNode = constantNode;
+                            }
+
                             break;
                     }
                 }

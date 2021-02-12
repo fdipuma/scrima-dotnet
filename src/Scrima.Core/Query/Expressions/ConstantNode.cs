@@ -159,5 +159,12 @@ namespace Scrima.Core.Query.Expressions
         /// <param name="value">The value.</param>
         /// <returns>A ConstantNode representing a time value.</returns>
         public static ConstantNode Time(string literalText, TimeSpan value) => new ConstantNode(EdmPrimitiveType.TimeOfDay, literalText, value);
+
+        /// <summary>
+        /// Gets a ConstantNode which represents a time value.
+        /// </summary>
+        /// <param name="elements"></param>
+        /// <returns>A ConstantNode representing a time value.</returns>
+        public static ArrayNode Array(params ConstantNode[] elements) => new ArrayNode(elements);
     }
 }

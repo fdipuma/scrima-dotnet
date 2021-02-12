@@ -34,5 +34,10 @@
         /// The query node is a unary operator query node.
         /// </summary>
         UnaryOperator = 5,
+        
+        /// <summary>
+        /// The query node is an array of constant values query node.
+        /// </summary>
+        Array = 6,
     }
 }

@@ -16,7 +16,7 @@ namespace Scrima.OData.Parsers
             new TokenDefinition(TokenType.False,                @"false"),
             new TokenDefinition(TokenType.Null,                 @"null"),
             new TokenDefinition(TokenType.UnaryOperator,        @"not(?=\s|$)"),
-            new TokenDefinition(TokenType.BinaryOperator,       @"(eq|ne|gt|ge|lt|le|has|add|sub|mul|div|mod)(?=\s|$)"),
+            new TokenDefinition(TokenType.BinaryOperator,       @"(eq|ne|gt|ge|lt|le|has|add|sub|mul|div|mod|in)(?=\s|$)"),
             new TokenDefinition(TokenType.DateTimeOffset,       @"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,12})?(Z|[+-]\d{2}:\d{2})?)?"),
             new TokenDefinition(TokenType.Date,                 @"\d{4}-\d{2}-\d{2}"),
             new TokenDefinition(TokenType.TimeOfDay,            @"\d{2}:\d{2}(:\d{2}(\.\d{1,12})?)?"),
