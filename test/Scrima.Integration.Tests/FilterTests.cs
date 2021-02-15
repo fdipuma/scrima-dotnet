@@ -171,6 +171,50 @@ namespace Scrima.Integration.Tests
         }
 
         [Fact]
+        public async Task Should_ReturnFiltered_When_FilteringOnArrayContainsForEnumsStrings_And_PropertyIsNullable()
+        {
+            const int testUserCount = 10;
+
+            var users = CreateUsers(testUserCount).ToList();
+
+            users[0].SecondaryType = UserType.Admin;
+            users[3].SecondaryType = UserType.Admin;
+            users[5].SecondaryType = UserType.SuperAdmin;
+            
+            using var server = SetupSample(users);
+            using var client = server.CreateClient();
+
+            var response = await client.GetQueryAsync<User>("/users?$filter=secondarytype in ('admin', 'superadmin')");
+
+            response.Results.Should().HaveCount(3);
+            response.Results[0].Username.Should().Be("user1");
+            response.Results[1].Username.Should().Be("user4");
+            response.Results[2].Username.Should().Be("user6");
+        }
+
+        [Fact]
+        public async Task Should_ReturnFiltered_When_FilteringOnArrayContainsForEnumsInts_And_PropertyIsNullable()
+        {
+            const int testUserCount = 10;
+
+            var users = CreateUsers(testUserCount).ToList();
+
+            users[0].SecondaryType = UserType.Admin;
+            users[3].SecondaryType = UserType.Admin;
+            users[5].SecondaryType = UserType.SuperAdmin;
+            
+            using var server = SetupSample(users);
+            using var client = server.CreateClient();
+
+            var response = await client.GetQueryAsync<User>("/users?$filter=secondarytype in (1, 2)");
+
+            response.Results.Should().HaveCount(3);
+            response.Results[0].Username.Should().Be("user1");
+            response.Results[1].Username.Should().Be("user4");
+            response.Results[2].Username.Should().Be("user6");
+        }
+
+        [Fact]
         public async Task Should_ReturnFiltered_When_FilteringOnIntLessGreaterThan()
         {
             const int testUserCount = 10;

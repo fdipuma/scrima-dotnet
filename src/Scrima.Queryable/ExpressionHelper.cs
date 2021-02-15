@@ -82,7 +82,7 @@ namespace Scrima.Queryable
 
                     var enumValue = ParseEnum(otherPrimitiveType, stringValue);
 
-                    return Expression.Constant(enumValue);
+                    return Expression.Constant(enumValue, otherNullableType ?? otherPrimitiveType);
                 }
             }
 
@@ -207,7 +207,7 @@ namespace Scrima.Queryable
                 }
             }
             
-            if (otherNullableType is not null && toPromotePrimiveType != typeof(object))
+            if (otherNullableType is not null && !otherPrimitiveType.IsEnum && toPromotePrimiveType != typeof(object))
             {
                 // this will promote nullables to the best matching type of nullable (in this case is the same type of the "toPromote" type)
                 

@@ -51,6 +51,7 @@ namespace Scrima.Queryable.Tests
                             new NestedModel {Id = 3, Name = "Element 3"}
                         },
                     EnumValue = TestEnum.ThirdValue,
+                    OptionalEnumValue = TestEnum.ThirdValue,
                     NestedModel = new NestedModel {Id = 98, Name = "Element 98"},
                 },
                 new TestModel
@@ -67,6 +68,7 @@ namespace Scrima.Queryable.Tests
                         },
                     NestedModel = new NestedModel {Id = 97, Name = "Element 97"},
                     EnumValue = TestEnum.SecondValue,
+                    OptionalEnumValue = TestEnum.SecondValue,
                     OptionalDateTimeOffset = new DateTimeOffset(2021, 02, 01, 0, 0, 0, TimeSpan.Zero),
                     OptionalDate = new DateTime(2021, 02, 01, 0, 0, 0)
                 }
@@ -228,6 +230,123 @@ namespace Scrima.Queryable.Tests
             var value = results.Results.First();
             value.EnumValue.Should().Be(TestEnum.SecondValue);
         }
+        
+        [Fact]
+        public void Should_filter_on_nullable_enum_property_when_input_is_string()
+        {
+            var query = new QueryOptions(
+                _edmType,
+                new FilterQueryOption(
+                    new BinaryOperatorNode(
+                        new PropertyAccessNode(
+                            new[]
+                            {
+                                new EdmProperty(nameof(TestModel.OptionalEnumValue),
+                                    new EdmEnumType(typeof(TestEnum),
+                                        new[]
+                                        {
+                                            new EdmEnumMember("FirstValue", 0),
+                                            new EdmEnumMember("SecondValue", 1),
+                                            new EdmEnumMember("ThirdValue", 2),
+                                        }), _edmType)
+                            }
+                        ),
+                        BinaryOperatorKind.Equal,
+                        new ConstantNode(EdmPrimitiveType.String, "SecondValue", "SecondValue"))
+                ),
+                new OrderByQueryOption(Enumerable.Empty<OrderByProperty>()),
+                null,
+                0,
+                null,
+                10,
+                true
+            );
+
+            var results = _queryable.ToQueryResult(query);
+
+            results.Results.Should().ContainSingle();
+            results.Count.Should().Be(1);
+            var value = results.Results.First();
+            value.OptionalEnumValue.Should().Be(TestEnum.SecondValue);
+        }
+
+        [Fact]
+        public void Should_filter_on_nullable_enum_property_when_input_is_int()
+        {
+            var query = new QueryOptions(
+                _edmType,
+                new FilterQueryOption(
+                    new BinaryOperatorNode(
+                        new PropertyAccessNode(
+                            new[]
+                            {
+                                new EdmProperty(nameof(TestModel.OptionalEnumValue),
+                                    new EdmEnumType(typeof(TestEnum),
+                                        new[]
+                                        {
+                                            new EdmEnumMember("FirstValue", 0),
+                                            new EdmEnumMember("SecondValue", 1),
+                                            new EdmEnumMember("ThirdValue", 2),
+                                        }), _edmType)
+                            }
+                        ),
+                        BinaryOperatorKind.Equal,
+                        new ConstantNode(EdmPrimitiveType.Int32, "1", 1))
+                ),
+                new OrderByQueryOption(Enumerable.Empty<OrderByProperty>()),
+                null,
+                0,
+                null,
+                10,
+                true
+            );
+
+            var results = _queryable.ToQueryResult(query);
+
+            results.Results.Should().ContainSingle();
+            results.Count.Should().Be(1);
+            var value = results.Results.First();
+            value.OptionalEnumValue.Should().Be(TestEnum.SecondValue);
+        }
+
+        [Fact]
+        public void Should_filter_on_nullable_enum_property_when_input_is_null()
+        {
+            var query = new QueryOptions(
+                _edmType,
+                new FilterQueryOption(
+                    new BinaryOperatorNode(
+                        new PropertyAccessNode(
+                            new[]
+                            {
+                                new EdmProperty(nameof(TestModel.OptionalEnumValue),
+                                    new EdmEnumType(typeof(TestEnum),
+                                        new[]
+                                        {
+                                            new EdmEnumMember("FirstValue", 0),
+                                            new EdmEnumMember("SecondValue", 1),
+                                            new EdmEnumMember("ThirdValue", 2),
+                                        }), _edmType)
+                            }
+                        ),
+                        BinaryOperatorKind.Equal,
+                        ConstantNode.Null)
+                ),
+                new OrderByQueryOption(Enumerable.Empty<OrderByProperty>()),
+                null,
+                0,
+                null,
+                10,
+                true
+            );
+
+            var results = _queryable.ToQueryResult(query);
+
+            results.Results.Should().ContainSingle();
+            results.Count.Should().Be(1);
+            var value = results.Results.First();
+            value.OptionalEnumValue.Should().BeNull();
+        }
 
         [Fact]
         public void Should_filter_on_enum_property_when_input_is_string()
@@ -265,6 +384,94 @@ namespace Scrima.Queryable.Tests
             results.Count.Should().Be(1);
             var value = results.Results.First();
             value.EnumValue.Should().Be(TestEnum.SecondValue);
+        }
+        
+        [Fact]
+        public void Should_filter_on_nullable_enum_property_when_input_is_array_of_strings()
+        {
+            var query = new QueryOptions(
+                _edmType,
+                new FilterQueryOption(
+                    new BinaryOperatorNode(
+                        new PropertyAccessNode(
+                            new[]
+                            {
+                                new EdmProperty(nameof(TestModel.OptionalEnumValue),
+                                    new EdmEnumType(typeof(TestEnum),
+                                        new[]
+                                        {
+                                            new EdmEnumMember("FirstValue", 0),
+                                            new EdmEnumMember("SecondValue", 1),
+                                            new EdmEnumMember("ThirdValue", 2),
+                                        }), _edmType)
+                            }
+                        ),
+                        BinaryOperatorKind.In,
+                        new ArrayNode(new []
+                        {
+                            new ConstantNode(EdmPrimitiveType.String, "SecondValue", "SecondValue"),
+                            new ConstantNode(EdmPrimitiveType.String, "ThirdValue", "ThirdValue"),
+                        }))
+                ),
+                new OrderByQueryOption(Enumerable.Empty<OrderByProperty>()),
+                null,
+                0,
+                null,
+                10,
+                true
+            );
+
+            var results = _queryable.ToQueryResult(query);
+
+            results.Results.Should().HaveCount(2);
+            results.Count.Should().Be(2);
+            
+            results.Results.First().OptionalEnumValue.Should().Be(TestEnum.ThirdValue);
+            results.Results.Last().OptionalEnumValue.Should().Be(TestEnum.SecondValue);
+        }
+
+        [Fact]
+        public void Should_filter_on_nullable_enum_property_when_input_is_array_of_int()
+        {
+            var query = new QueryOptions(
+                _edmType,
+                new FilterQueryOption(
+                    new BinaryOperatorNode(
+                        new PropertyAccessNode(
+                            new[]
+                            {
+                                new EdmProperty(nameof(TestModel.OptionalEnumValue),
+                                    new EdmEnumType(typeof(TestEnum),
+                                        new[]
+                                        {
+                                            new EdmEnumMember("FirstValue", 0),
+                                            new EdmEnumMember("SecondValue", 1),
+                                            new EdmEnumMember("ThirdValue", 2),
+                                        }), _edmType)
+                            }
+                        ),
+                        BinaryOperatorKind.In,
+                        new ArrayNode(new []
+                        {
+                            new ConstantNode(EdmPrimitiveType.Int32, "1", 1),
+                            new ConstantNode(EdmPrimitiveType.Int32, "2", 2),
+                        }))
+                ),
+                new OrderByQueryOption(Enumerable.Empty<OrderByProperty>()),
+                null,
+                0,
+                null,
+                10,
+                true
+            );
+
+            var results = _queryable.ToQueryResult(query);
+
+            results.Results.Should().HaveCount(2);
+            results.Count.Should().Be(2);
+            
+            results.Results.First().OptionalEnumValue.Should().Be(TestEnum.ThirdValue);
+            results.Results.Last().OptionalEnumValue.Should().Be(TestEnum.SecondValue);
         }
 
         [Fact]
@@ -477,6 +684,7 @@ namespace Scrima.Queryable.Tests
             public decimal Price { get; set; }
             public int? NullableInt { get; set; }
             public TestEnum EnumValue { get; set; }
+            public TestEnum? OptionalEnumValue { get; set; }
             public NestedModel NestedModel { get; set; }
             public IEnumerable<NestedModel> NestedList { get; set; }
         }

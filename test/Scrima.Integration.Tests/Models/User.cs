@@ -17,6 +17,7 @@ namespace Scrima.Integration.Tests.Models
         public DateTimeOffset CreatedAt { get; set; }
         
         public UserType Type { get; set; }
+        public UserType SecondaryType { get; set; }
 
         public string EMail { get; set; }
 

@@ -221,17 +221,22 @@ namespace Scrima.Queryable
                         var sourceArg = arguments[0];
                         var elementArg = arguments[1];
 
-                        if (itemType != elementArg.Type && (itemType.IsEnum || elementArg.Type.IsEnum))
+                        var itemIsEnum = IsEnumOrNullableEnum(itemType, out var itemEnumType);
+                        var argIsEnum = IsEnumOrNullableEnum(elementArg.Type, out var argEnumType);
+
+                        if (itemType != elementArg.Type && (itemIsEnum || argIsEnum))
                         {
                             // enum: we need to convert/promote expression to enum types
 
-                            var enumType = itemType.IsEnum ? itemType : elementArg.Type;
+                            var enumType = itemIsEnum ? itemEnumType : argEnumType;
+                            var arrayType = itemIsEnum ? itemType : elementArg.Type;
 
                             if (sourceArg is ConstantExpression sourceConstantExpression)
                             {
-                                var sourceEnumerable = ((IEnumerable)sourceConstantExpression.Value).Cast<object>().ToArray();
+                                var sourceEnumerable = ((IEnumerable)sourceConstantExpression.Value).Cast<object>()
+                                    .ToArray();
 
-                                var enumArray = Array.CreateInstance(enumType, sourceEnumerable.Length);
+                                var enumArray = Array.CreateInstance(arrayType, sourceEnumerable.Length);
 
                                 for (var index = 0; index < sourceEnumerable.Length; index++)
                                 {
@@ -241,7 +246,7 @@ namespace Scrima.Queryable
 
                                 sourceArg = Expression.Constant(enumArray, enumArray.GetType());
 
-                                itemType = enumType;
+                                itemType = arrayType;
                             }
                             else if (elementArg is ConstantExpression elementConstantExpression)
                             {
@@ -581,6 +586,27 @@ namespace Scrima.Queryable
                 default:
                     throw new QueryOptionsValidationException($"Could not find any function '{functionName}'");
             }
+        }
+
+        private static bool IsEnumOrNullableEnum(Type itemType, out Type enumType)
+        {
+            enumType = null;
+
+            if (itemType.IsEnum)
+            {
+                enumType = itemType;
+                return true;
+            }
+
+            var underlyingType = Nullable.GetUnderlyingType(itemType);
+
+            if (underlyingType?.IsEnum == true)
+            {
+                enumType = underlyingType;
+                return true;
+            }
+
+            return false;
         }
 
         private static Type ParseTargetType(Expression argument)
