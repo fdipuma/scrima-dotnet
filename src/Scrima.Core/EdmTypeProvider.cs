@@ -90,7 +90,10 @@ namespace Scrima.Core
             }
 
             var baseType = clrType.BaseType != typeof(object)
-                ? ResolveEdmType(clrType.BaseType)
+                ? ResolveEdmType(
+                    clrType: clrType.BaseType,
+                    visitedTypes: visitedTypes
+                  )
                 : null;
 
             var clrTypeProperties = clrType
