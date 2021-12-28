@@ -47,6 +47,8 @@ namespace Scrima.Core.Query.Expressions
         /// </summary>
         public object Value { get; }
 
+        public override string ToString() => LiteralText;
+
         /// <summary>
         /// Gets the ConstantNode which represents a value of false.
         /// </summary>

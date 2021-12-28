@@ -38,5 +38,10 @@
         /// Gets the right query node.
         /// </summary>
         public QueryNode Right { get; set; }
+
+        public override string ToString()
+        {
+            return $"({Left} {OperatorKind} {Right})";
+        }
     }
 }

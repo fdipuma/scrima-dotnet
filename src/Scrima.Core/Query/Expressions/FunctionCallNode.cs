@@ -35,5 +35,7 @@ namespace Scrima.Core.Query.Expressions
         public IReadOnlyList<QueryNode> Parameters => _parameters;
 
         public void AddParameter(QueryNode queryNode) =>_parameters.Add(queryNode);
+
+        public override string ToString() => $"{Name}({string.Join(",", Parameters)})";
     }
 }

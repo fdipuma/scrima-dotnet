@@ -23,5 +23,7 @@ namespace Scrima.Core.Query
         /// Gets the property to order by.
         /// </summary>
         public EdmProperty Property { get; }
+
+        public override string ToString() => $"{Property.Name}-{Direction}";
     }
 }

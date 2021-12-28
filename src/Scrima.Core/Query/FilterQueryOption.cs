@@ -19,5 +19,12 @@ namespace Scrima.Core.Query
         /// Gets the expression.
         /// </summary>
         public QueryNode Expression { get; }
+
+        public override string ToString()
+        {
+            var expression =  Expression?.ToString() ?? "<none>";
+
+            return $"Filter={expression}";
+        }
     }
 }
