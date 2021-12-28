@@ -31,5 +31,7 @@ namespace Scrima.Core.Query.Expressions
         /// Gets the kind of the operator.
         /// </summary>
         public UnaryOperatorKind OperatorKind { get; }
+
+        public override string ToString() => $"{OperatorKind} {Operand}";
     }
 }

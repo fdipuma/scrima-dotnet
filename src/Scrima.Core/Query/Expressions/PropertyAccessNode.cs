@@ -34,5 +34,7 @@ namespace Scrima.Core.Query.Expressions
         /// Gets the <see cref="EdmType"/> of the property value.
         /// </summary>
         public override EdmType EdmValueType => Properties.Last().PropertyType;
+
+        public override string ToString() => string.Join(".", Properties);
     }
 }

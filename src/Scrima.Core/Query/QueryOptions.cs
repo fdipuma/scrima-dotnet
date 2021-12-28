@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using Scrima.Core.Model;
 
 namespace Scrima.Core.Query
@@ -71,41 +72,44 @@ namespace Scrima.Core.Query
         /// Gets the show count query option.
         /// </summary>
         public bool ShowCount { get; }
+
+        public override string ToString()
+        {
+            var builder = new StringBuilder($"QueryOptions[{EdmType.Name}]: ");
+
+            if (Filter is not null)
+            {
+                builder.Append($"{Filter}; ");
+            }
+
+            if (Search is not null)
+            {
+                builder.Append($"Search={Search}; ");
+            }
+
+            if (Skip is not null)
+            {
+                builder.Append($"Skip={Skip}; ");
+            }
+
+            if (Top is not null)
+            {
+                builder.Append($"Top={Top}; ");
+            }
+
+            if (SkipToken is not null)
+            {
+                builder.Append($"SkipToken={SkipToken}; ");
+            }
+
+            if (OrderBy is not null)
+            {
+                builder.Append($"{OrderBy}; ");
+            }
+            
+            builder.Append($"ShowCount={ShowCount}");
+
+            return builder.ToString();
+        }
     }
-    //
-    // /// <summary>
-    // /// An object which contains query options bound to a specific type
-    // /// </summary>
-    // public class QueryOptions<T> : QueryOptions
-    // {
-    //     /// <summary>
-    //     /// Initialises a new instance of the <see cref="QueryOptions{T}" /> class.
-    //     /// </summary>
-    //     /// <param name="edmType"></param>
-    //     /// <param name="filter">Filter query option</param>
-    //     /// <param name="orderBy">Order by query option</param>
-    //     /// <param name="search">Search query option</param>
-    //     /// <param name="skip">Skip query option</param>
-    //     /// <param name="skipToken">Skip token query option</param>
-    //     /// <param name="top">Top query option</param>
-    //     /// <param name="showCount"></param>
-    //     public QueryOptions(EdmComplexType edmType, FilterQueryOption filter, OrderByQueryOption orderBy, string search,
-    //         long? skip, string skipToken, long? top, bool showCount) : base(edmType, filter, orderBy, search, skip,
-    //         skipToken, top, showCount)
-    //     {
-    //     }
-    //
-    //     /// <summary>
-    //     /// Initialises a new instance of the <see cref="QueryOptions{T}" /> class using another <see cref="QueryOptions" /> as base .
-    //     /// </summary>
-    //     /// <param name="other">Other options to copy from</param>
-    //     /// <exception cref="ArgumentNullException"></exception>
-    //     public QueryOptions(QueryOptions other) : this(other.EdmType, other.Filter, other.OrderBy,
-    //         other.Search, other.Skip, other.SkipToken, other.Top, other.ShowCount)
-    //     {
-    //         if (other == null) throw new ArgumentNullException(nameof(other));
-    //         if (other.EdmType.ClrType != typeof(T))
-    //             throw new ArgumentException("The EdmType of the other query options must be the same of the current type");
-    //     }
-    // }
 }

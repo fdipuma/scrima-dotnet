@@ -21,5 +21,15 @@ namespace Scrima.Core.Query
         /// Gets the properties the query should be ordered by.
         /// </summary>
         public IReadOnlyList<OrderByProperty> Properties { get; }
+
+        public override string ToString()
+        {
+            if (Properties.Count == 0)
+                return "OrderBy=<none>";
+
+            var props = string.Join(",", Properties);
+            
+            return $"OrderBy={props}";
+        }
     }
 }

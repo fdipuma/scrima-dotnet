@@ -60,5 +60,7 @@ namespace Scrima.Core.Query.Expressions
                 return instance;
             }
         }
+
+        public override string ToString() => LiteralText;
     }
 }
