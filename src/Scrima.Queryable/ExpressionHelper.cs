@@ -279,5 +279,15 @@ namespace Scrima.Queryable
 
             throw new QueryOptionsValidationException($"Invalid value '{values}' for enum type {enumType.Name}");
         }
+
+        public static Expression CreateCastExpression(Expression argument, Type targetType)
+        {
+            if (targetType == TypeUtilities.StringType)
+            {
+                return Expression.Call(argument, Methods.ObjectToString);
+            }
+
+            return Expression.Convert(argument, targetType);
+        }
     }
 }
