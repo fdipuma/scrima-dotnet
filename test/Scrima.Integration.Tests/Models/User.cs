@@ -26,5 +26,6 @@ namespace Scrima.Integration.Tests.Models
 
         public double Engagement { get; set; }
         public decimal PayedAmout { get; set; }
+        public string DomainId { get; set; } = string.Empty;
     }
 }

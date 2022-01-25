@@ -92,7 +92,7 @@ namespace Scrima.OData.Parsers
                     return ConstantNode.Single(token.Value, singleValue);
 
                 case TokenType.String:
-                    var stringText = token.Value.Trim('\'').Replace("''", "'");
+                    var stringText = UnescapeStringText(token.Value);
                     return ConstantNode.String(token.Value, stringText);
 
                 case TokenType.TimeOfDay:
@@ -105,6 +105,19 @@ namespace Scrima.OData.Parsers
                 default:
                     throw new NotSupportedException(token.TokenType.ToString());
             }
+        }
+
+        private static string UnescapeStringText(string tokenValue)
+        {
+            return tokenValue
+                    .Trim('\'')
+                    .Replace("''", "'")
+                    .Replace("%2B", "+")
+                    .Replace("%2F", "/")
+                    .Replace("%3F", "?")
+                    .Replace("%25", "%")
+                    .Replace("%23", "#")
+                    .Replace("%26", "&");
         }
     }
 }
