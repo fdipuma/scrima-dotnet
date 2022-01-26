@@ -31,7 +31,7 @@ namespace Scrima.OData.Parsers
             new TokenDefinition(TokenType.Duration,             @"duration'(-)?P\d+DT\d{2}H\d{2}M\d{2}\.\d+S'"),
             new TokenDefinition(TokenType.Enum,                 @"\w+(\.\w+)+'\w+(\,\w+)*'"),
             new TokenDefinition(TokenType.PropertyName,         @"[\w\/]+"),
-            new TokenDefinition(TokenType.String,               @"'(?:''|[\w\s-.~!$&()*+,;=@\\\/]*)*'"),
+            new TokenDefinition(TokenType.String,               @"'(?:''|[\w\s-.~!$&()*+,;=@%\\\/]*)*'"),
             new TokenDefinition(TokenType.Whitespace,           @"\s", ignore: true),
         };
 

@@ -113,6 +113,19 @@ namespace Scrima.Integration.Tests
         }
 
         [Fact]
+        public async Task Should_ReturnFiltered_When_FilteringOnStringContainsWithSlash()
+        {
+            const int testUserCount = 10;
+            using var server = SetupSample(CreateUsers(testUserCount));
+            using var client = server.CreateClient();
+
+            var response = await client.GetQueryAsync<User>("/users?%24filter=contains(domainid%2C%27%252F4%27)");
+
+            response.Results.Should().ContainSingle();
+            response.Results[0].Username.Should().Be("user4");
+        }
+
+        [Fact]
         public async Task Should_ReturnFiltered_When_FilteringOnArrayContains()
         {
             const int testUserCount = 10;
@@ -299,6 +312,7 @@ namespace Scrima.Integration.Tests
                 EMail = $"user{i}@email.com",
                 FirstName = $"Jon{i}",
                 LastName = $"Smith{i}",
+                DomainId = $"Smith/{i}",
                 CreatedAt = new DateTimeOffset(2021, 1, i, 10, 0, 0, TimeSpan.Zero),
                 Engagement = 0.2 + i,
                 PayedAmout = (i % 2) * 25.30m,

@@ -38,5 +38,24 @@ namespace Scrima.OData.Tests
             rawQueryParsed.Skip.Should().BeNull();
             rawQueryParsed.SkipToken.Should().BeNull();
         }
+        
+        [Theory]
+        [InlineData("?$filter=name eq '/Jon'")]
+        [InlineData("$filter=name eq '/Jon'")]
+        [InlineData("$filter=name eq '%2FJon'")]
+        [InlineData("%24filter=name+eq+%27%2FJon%27")]
+        public void Should_ParseRawString_When_ContainsSlash(string rawQueryString)
+        {
+            var rawQueryParsed = ODataRawQueryOptions.ParseRawQuery(rawQueryString);
+
+            rawQueryParsed.Should().NotBeNull();
+            rawQueryParsed.Filter.Should().Be("name eq '/Jon'");
+            rawQueryParsed.Count.Should().BeNull();
+            rawQueryParsed.Search.Should().BeNull();
+            rawQueryParsed.OrderBy.Should().BeNull();
+            rawQueryParsed.Top.Should().BeNull();
+            rawQueryParsed.Skip.Should().BeNull();
+            rawQueryParsed.SkipToken.Should().BeNull();
+        }
     }
 }
