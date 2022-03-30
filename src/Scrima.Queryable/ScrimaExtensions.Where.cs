@@ -82,10 +82,10 @@ namespace Scrima.Queryable
 
             // bitwise operations
             if (kind == BinaryOperatorKind.Or)
-                return Expression.Or(left, right);
+                return Expression.OrElse(left, right);
 
             if (kind == BinaryOperatorKind.And)
-                return Expression.And(left, right);
+                return Expression.AndAlso(left, right);
 
             // enum.HasFlag()
             if (kind == BinaryOperatorKind.Has)
