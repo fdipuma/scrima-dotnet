@@ -614,6 +614,37 @@ namespace Scrima.Queryable.Tests
             var value = results.Results.First();
             value.Id.Should().Be(3);
         }
+        
+        [Theory]
+        [InlineData(OrderByDirection.Ascending, null)]
+        [InlineData(OrderByDirection.Descending, "2/1/2021 12:00:00 AM")]
+        public void Should_orderby_on_datetimenullable_property(OrderByDirection direction, string? expected)
+        {
+            DateTime? expectedDateTime = null;
+
+            if (expected is not null)
+            {
+                expectedDateTime = DateTime.Parse(expected);
+            }
+            
+            var query = new QueryOptions(
+                _edmType,
+                new FilterQueryOption(null),
+                new OrderByQueryOption(
+                    new []{new OrderByProperty(new EdmProperty(nameof(TestModel.OptionalDate), EdmPrimitiveType.Date, _edmType), direction)}    
+                ),
+                null,
+                0,
+                null,
+                10,
+                true
+            );
+
+            var results = _queryable.ToQueryResult(query);
+
+            results.Count.Should().Be(3);
+            results.Results.First().OptionalDate.Should().Be(expectedDateTime);
+        }
 
         [Fact]
         public void Should_filter_on_datetime_property_when_input_is_datetime()
