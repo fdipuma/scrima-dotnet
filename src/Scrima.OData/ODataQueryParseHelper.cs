@@ -37,17 +37,14 @@ namespace Scrima.OData
 
             var parts = rawValue.Split(SplitCharacter.Space, StringSplitOptions.RemoveEmptyEntries);
 
-            EdmProperty property;
             var direction = OrderByDirection.Ascending;
 
-            if (parts.Length == 1)
-            {
-                property = model.GetProperty(parts[0]);
-            }
-            else
-            {
-                property = model.GetProperty(parts[0]);
+            var propertyName = parts[0];
 
+            var properties = PropertyParseHelper.ParseNestedProperties(propertyName, model);
+            
+            if (parts.Length != 1)
+            {
                 switch (parts[1])
                 {
                     case "asc":
@@ -63,7 +60,7 @@ namespace Scrima.OData
                 }
             }
 
-            return new OrderByProperty(property, direction);
+            return new OrderByProperty(properties, direction);
         }
 
         public static FilterQueryOption ParseFilter(string rawQuery, EdmComplexType model, EdmTypeProvider typeProvider)

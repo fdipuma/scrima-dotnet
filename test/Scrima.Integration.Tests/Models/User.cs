@@ -15,6 +15,8 @@ namespace Scrima.Integration.Tests.Models
         public string Username { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime RegistrationDate { get; set; }
         
         public UserType Type { get; set; }
         public UserType SecondaryType { get; set; }
@@ -27,5 +29,6 @@ namespace Scrima.Integration.Tests.Models
         public double Engagement { get; set; }
         public decimal PayedAmout { get; set; }
         public string DomainId { get; set; } = string.Empty;
+        
     }
 }

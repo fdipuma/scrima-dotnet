@@ -303,19 +303,7 @@ namespace Scrima.OData.Parsers
             
             private static PropertyAccessNode CreatePropertyAccessNode(string tokenValue, EdmComplexType edmComplexType)
             {
-                var properties = new List<EdmProperty>();
-                
-                foreach (var propertyName in tokenValue.Split('/'))
-                {
-                    if (edmComplexType is null)
-                    {
-                        throw new ODataParseException($"Property {propertyName} not found");
-                    }
-
-                    var currentProperty = edmComplexType.GetProperty(propertyName);
-                    properties.Add(currentProperty);
-                    edmComplexType = currentProperty.PropertyType as EdmComplexType;
-                }
+                var properties = PropertyParseHelper.ParseNestedProperties(tokenValue, edmComplexType);
 
                 var propertyAccessNode = new PropertyAccessNode(properties);
                 return propertyAccessNode;

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using Scrima.Core.Model;
 
 namespace Scrima.Core.Query
@@ -8,9 +11,22 @@ namespace Scrima.Core.Query
     /// </summary>
     public sealed class OrderByProperty
     {
-        public OrderByProperty(EdmProperty property, OrderByDirection direction)
+        public OrderByProperty(EdmProperty property, OrderByDirection direction) : this(new[] {property}, direction)
         {
-            Property = property ?? throw new ArgumentNullException(nameof(property));
+            
+        }
+        
+        public OrderByProperty(IEnumerable<EdmProperty> properties, OrderByDirection direction)
+        {
+            if (properties == null) throw new ArgumentNullException(nameof(properties));
+            
+            Properties = new ReadOnlyCollection<EdmProperty>(properties.ToList());
+            
+            if (Properties.Count == 0)
+            {
+                throw new InvalidOperationException("At least one order by property must be selected");
+            }
+            
             Direction = direction;
         }
 
@@ -20,10 +36,13 @@ namespace Scrima.Core.Query
         public OrderByDirection Direction { get; }
 
         /// <summary>
-        /// Gets the property to order by.
+        /// Gets the properties to order by.
         /// </summary>
-        public EdmProperty Property { get; }
+        public IReadOnlyList<EdmProperty> Properties { get; }
 
-        public override string ToString() => $"{Property.Name}-{Direction}";
+        public override string ToString()
+        {
+            return $"{string.Join(".", Properties)}-{Direction}";
+        }
     }
 }

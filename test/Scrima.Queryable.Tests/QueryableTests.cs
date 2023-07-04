@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
 using FluentAssertions;
@@ -624,7 +625,7 @@ namespace Scrima.Queryable.Tests
 
             if (expected is not null)
             {
-                expectedDateTime = DateTime.Parse(expected);
+                expectedDateTime = DateTime.Parse(expected, CultureInfo.InvariantCulture);
             }
             
             var query = new QueryOptions(
@@ -703,6 +704,39 @@ namespace Scrima.Queryable.Tests
             results.Results.Should().HaveCount(3);
             results.Count.Should().Be(3);
             results.Results.Should().BeInAscendingOrder(o => o.Id);
+        }
+
+        [Fact]
+        public void Should_order_by_nested_property()
+        {
+            var edmTypeProvider = new EdmTypeProvider();
+            var nestedType = edmTypeProvider.GetByClrType(typeof(NestedModel)) as EdmComplexType;
+            
+            var query = new QueryOptions(
+                _edmType,
+                new FilterQueryOption(null),
+                new OrderByQueryOption(new[]
+                {
+                    new OrderByProperty(
+                        new[]
+                        {
+                            new EdmProperty(nameof(TestModel.NestedModel), nestedType, _edmType),
+                            new EdmProperty(nameof(NestedModel.Id), EdmPrimitiveType.Int32, nestedType),
+                        },
+                        OrderByDirection.Ascending)
+                }),
+                null,
+                0,
+                null,
+                10,
+                true
+            );
+
+            var results = _queryable.ToQueryResult(query);
+
+            results.Results.Should().HaveCount(3);
+            results.Count.Should().Be(3);
+            results.Results.Should().BeInAscendingOrder(o => o.NestedModel.Id);
         }
 
         public class TestModel
