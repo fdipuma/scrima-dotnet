@@ -40,6 +40,18 @@ namespace Scrima.Integration.Tests
             response.Results.Should().HaveCount(5);
         }
 
+        [Fact]
+        public async Task Should_ReturnFiltered_When_FilteringOnDateWithoutTime()
+        {
+            const int testUserCount = 10;
+            using var server = SetupSample(CreateUsers(testUserCount));
+            using var client = server.CreateClient();
+            
+            var response = await client.GetQueryAsync<User>($"/users?$filter=registrationDate gt 2021-01-05");
+
+            response.Results.Should().HaveCount(5);
+        }
+
         private static IEnumerable<User> CreateUsers(int testUserCount) =>
             Enumerable.Range(1, testUserCount).Select(i => new User
             {
@@ -48,6 +60,7 @@ namespace Scrima.Integration.Tests
                 FirstName = $"Jon{i}",
                 LastName = $"Smith{i}",
                 CreatedAt = new DateTimeOffset(2021, 1, i, 10, 0, 0, TimeSpan.Zero),
+                RegistrationDate = new DateTime(2021, 1, i, 0, 0, 0),
                 Engagement = 0.2 + i,
                 PayedAmout = (i % 2) * 25.30m,
                 Blogs = new List<Blog>

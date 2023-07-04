@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -12,10 +13,10 @@ namespace Scrima.Integration.Tests
     {
         private static User[] OrderByTestUsers => new[]
         {
-            new User {Username = "A", FirstName = "Name2"},
-            new User {Username = "B", FirstName = "Name1"},
-            new User {Username = "C", FirstName = "Name2"},
-            new User {Username = "D", FirstName = "Name1"}
+            new User {Username = "A", FirstName = "Name2", Blogs = new List<Blog> { new() { Name = "Blog1"}}},
+            new User {Username = "B", FirstName = "Name1", Blogs = new List<Blog> { new() { Name = "Blog2"}}},
+            new User {Username = "C", FirstName = "Name2", Blogs = new List<Blog> { new() { Name = "Blog3"}}},
+            new User {Username = "D", FirstName = "Name1", Blogs = new List<Blog> { new() { Name = "Blog4"}}},
         };
 
         [Fact]
@@ -38,6 +39,17 @@ namespace Scrima.Integration.Tests
             var response = await client.GetQueryAsync<User>("/users?$orderby=username");
             
             response.Results.Should().BeInAscendingOrder(r => r.Username);
+        }
+
+        [Fact]
+        public async Task Should_SortByNestedProperty_When_SlashIsFoundInName()
+        {
+            using var server = SetupSample(OrderByTestUsers);
+            using var client = server.CreateClient();
+
+            var response = await client.GetQueryAsync<Blog>("/blogs?$orderby=owner/username desc");
+            
+            response.Results.Should().BeInDescendingOrder(r => r.Name);
         }
 
         [Fact]

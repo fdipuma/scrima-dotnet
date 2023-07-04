@@ -32,7 +32,19 @@ namespace Scrima.Queryable
             foreach (var clause in orderByQueryOption.Properties)
             {
                 // o.PropertyName
-                var propertyExpression = Expression.Property(parameter, clause.Property.Name);
+                Expression propertyExpression = parameter;
+                
+                foreach (var edmProperty in clause.Properties)
+                {
+                    var property = propertyExpression.Type.GetProperty(edmProperty.Name);
+                
+                    if (property is null)
+                    {
+                        throw new QueryOptionsValidationException($"Invalid property name {edmProperty.Name}");
+                    }
+                
+                    propertyExpression = Expression.MakeMemberAccess(propertyExpression, property);
+                }
 
                 // o => o.PropertyName
                 var selectorExpression = Expression.Lambda(propertyExpression, parameter);
