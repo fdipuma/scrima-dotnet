@@ -89,5 +89,5 @@ namespace Scrima.Integration.Tests
     /// <summary>
     /// replace internal modifier with public to run tests on SqlServer
     /// </summary>
-    public class SqlServerDateFilterTests : DateFilterTests<SqlServerServicesInit> { }
+    internal class SqlServerDateFilterTests : DateFilterTests<SqlServerServicesInit> { }
 }
