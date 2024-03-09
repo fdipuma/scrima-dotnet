@@ -3,20 +3,20 @@ using System.Linq;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Scrima.OData.Swashbuckle
-{
-    internal class QueryOptionsOperationFilter : IOperationFilter
-    {
-        private readonly ScrimaSwaggerOptions _options;
-        private static readonly ODataSwaggerOptions DefaultTypeOptions = new();
+namespace Scrima.OData.Swashbuckle;
 
-        public QueryOptionsOperationFilter(ScrimaSwaggerOptions options)
-        {
+internal class QueryOptionsOperationFilter : IOperationFilter
+{
+    private readonly ScrimaSwaggerOptions _options;
+    private static readonly ODataSwaggerOptions DefaultTypeOptions = new();
+
+    public QueryOptionsOperationFilter(ScrimaSwaggerOptions options)
+    {
             _options = options;
         }
         
-        public void Apply(OpenApiOperation operation, OperationFilterContext context)
-        {
+    public void Apply(OpenApiOperation operation, OperationFilterContext context)
+    {
             var optionsType = OptionsType(context);
 
             if (optionsType is not null)
@@ -25,8 +25,8 @@ namespace Scrima.OData.Swashbuckle
             }
         }
 
-        private static Type OptionsType(OperationFilterContext context)
-        {
+    private static Type OptionsType(OperationFilterContext context)
+    {
             if (context.ApiDescription.ActionDescriptor.Properties.TryGetValue("scrima-odata-query", out var queryType))
             {
                 return queryType as Type;
@@ -35,8 +35,8 @@ namespace Scrima.OData.Swashbuckle
             return context.ApiDescription.ParameterDescriptions.FirstOrDefault(p => p.Type.IsODataQuery())?.Type;
         }
 
-        private void ChangeQueryOptions(OpenApiOperation operation, Type type)
-        {
+    private void ChangeQueryOptions(OpenApiOperation operation, Type type)
+    {
             var itemTypeOptions = DefaultTypeOptions;
 
             if (_options.ConfigureOptionsPerType is not null)
@@ -79,9 +79,9 @@ namespace Scrima.OData.Swashbuckle
                 itemTypeOptions.AllowTop);
         }
 
-        private static void UpdateParamInfo(OpenApiOperation operation, string paramName, string paramType,
-            string paramDescription, bool isParamAllowed)
-        {
+    private static void UpdateParamInfo(OpenApiOperation operation, string paramName, string paramType,
+        string paramDescription, bool isParamAllowed)
+    {
             var param = operation.Parameters.FirstOrDefault(p => p.Name == paramName);
             
             if (isParamAllowed)
@@ -104,5 +104,4 @@ namespace Scrima.OData.Swashbuckle
                 }
             }
         }
-    }
 }

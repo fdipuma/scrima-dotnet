@@ -1,27 +1,26 @@
 ﻿using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace Scrima.Queryable.Functions
+namespace Scrima.Queryable.Functions;
+
+internal class DayFunction : ScrimaQueryableFunction
 {
-    internal class DayFunction : ScrimaQueryableFunction
+    public override string FunctionName => "day";
+
+    public override Expression CreateExpression(IList<Expression> arguments)
     {
-        public override string FunctionName => "day";
+        ValidateParameterCount(arguments, 1);
 
-        public override Expression CreateExpression(IList<Expression> arguments)
+        if (arguments[0].Type == TypeUtilities.DateTimeType)
         {
-            ValidateParameterCount(arguments, 1);
-
-            if (arguments[0].Type == TypeUtilities.DateTimeType)
-            {
-                return Expression.MakeMemberAccess(arguments[0], Methods.DateTimeDay);
-            }
-
-            if (arguments[0].Type == TypeUtilities.DateTimeOffsetType)
-            {
-                return Expression.MakeMemberAccess(arguments[0], Methods.DateTimeOffsetDay);
-            }
-
-            return InvalidParameterTypes("DateTime, DateTimeOffset");
+            return Expression.MakeMemberAccess(arguments[0], Methods.DateTimeDay);
         }
+
+        if (arguments[0].Type == TypeUtilities.DateTimeOffsetType)
+        {
+            return Expression.MakeMemberAccess(arguments[0], Methods.DateTimeOffsetDay);
+        }
+
+        return InvalidParameterTypes("DateTime, DateTimeOffset");
     }
 }

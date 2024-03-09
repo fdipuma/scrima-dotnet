@@ -1,22 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace Scrima.Queryable.Functions
+namespace Scrima.Queryable.Functions;
+
+internal class ToLowerFunction : ScrimaQueryableFunction
 {
-    internal class ToLowerFunction : ScrimaQueryableFunction
+    public override string FunctionName => "tolower";
+
+    public override Expression CreateExpression(IList<Expression> arguments)
     {
-        public override string FunctionName => "tolower";
+        ValidateParameterCount(arguments, 1);
 
-        public override Expression CreateExpression(IList<Expression> arguments)
+        if (arguments[0].Type != TypeUtilities.StringType)
         {
-            ValidateParameterCount(arguments, 1);
-
-            if (arguments[0].Type != TypeUtilities.StringType)
-            {
-                return InvalidParameterTypes("strings");
-            }
-
-            return Expression.Call(arguments[0], Methods.StringToLowerInvariant);
+            return InvalidParameterTypes("strings");
         }
+
+        return Expression.Call(arguments[0], Methods.StringToLowerInvariant);
     }
 }

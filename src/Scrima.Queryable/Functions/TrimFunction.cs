@@ -1,22 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace Scrima.Queryable.Functions
+namespace Scrima.Queryable.Functions;
+
+internal class TrimFunction : ScrimaQueryableFunction
 {
-    internal class TrimFunction : ScrimaQueryableFunction
+    public override string FunctionName => "trim";
+
+    public override Expression CreateExpression(IList<Expression> arguments)
     {
-        public override string FunctionName => "trim";
+        ValidateParameterCount(arguments, 1);
 
-        public override Expression CreateExpression(IList<Expression> arguments)
+        if (arguments[0].Type != TypeUtilities.StringType)
         {
-            ValidateParameterCount(arguments, 1);
-
-            if (arguments[0].Type != TypeUtilities.StringType)
-            {
-                return InvalidParameterTypes("strings");
-            }
-
-            return Expression.Call(arguments[0], Methods.StringTrim);
+            return InvalidParameterTypes("strings");
         }
+
+        return Expression.Call(arguments[0], Methods.StringTrim);
     }
 }

@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace Scrima.Queryable.Functions
-{
-    internal class TimeFunction : ScrimaQueryableFunction
-    {
-        public override string FunctionName => "time";
+namespace Scrima.Queryable.Functions;
 
-        public override Expression CreateExpression(IList<Expression> arguments)
-        {
+internal class TimeFunction : ScrimaQueryableFunction
+{
+    public override string FunctionName => "time";
+
+    public override Expression CreateExpression(IList<Expression> arguments)
+    {
             ValidateParameterCount(arguments, 1);
 
             if (arguments[0].Type == TypeUtilities.DateTimeType)
@@ -23,5 +23,4 @@ namespace Scrima.Queryable.Functions
 
             return InvalidParameterTypes("DateTime, DateTimeOffset");
         }
-    }
 }

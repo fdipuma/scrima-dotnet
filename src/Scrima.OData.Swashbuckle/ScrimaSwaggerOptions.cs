@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Scrima.OData.Swashbuckle
+namespace Scrima.OData.Swashbuckle;
+
+public class ScrimaSwaggerOptions
 {
-    public class ScrimaSwaggerOptions
-    {
-        public Action<ODataSwaggerOptions, Type> ConfigureOptionsPerType { get; set; }
-    }
+    public Action<ODataSwaggerOptions, Type> ConfigureOptionsPerType { get; set; }
 }

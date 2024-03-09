@@ -1,20 +1,19 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Scrima.Integration.Tests.Models
+namespace Scrima.Integration.Tests.Models;
+
+public class BlogPost
 {
-    public class BlogPost
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
 
-        public string Title { get; set; }
+    public string Title { get; set; }
         
-        public string Text { get; set; }
+    public string Text { get; set; }
 
-        [ForeignKey(nameof(Blog))] public int BlogId { get; set; }
+    [ForeignKey(nameof(Blog))] public int BlogId { get; set; }
 
-        public Blog Blog { get; set; }
-    }
+    public Blog Blog { get; set; }
 }

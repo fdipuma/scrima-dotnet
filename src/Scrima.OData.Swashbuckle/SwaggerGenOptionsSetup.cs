@@ -5,13 +5,13 @@ using Scrima.Core.Model;
 using Scrima.Core.Query;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Scrima.OData.Swashbuckle
+namespace Scrima.OData.Swashbuckle;
+
+public static class SwaggerGenOptionsExtensions
 {
-    public static class SwaggerGenOptionsExtensions
+    public static void AddScrimaOData(this SwaggerGenOptions options,
+        Action<ScrimaSwaggerOptions> configureOptions = null)
     {
-        public static void AddScrimaOData(this SwaggerGenOptions options,
-            Action<ScrimaSwaggerOptions> configureOptions = null)
-        {
             var odataOptions = new ScrimaSwaggerOptions();
             configureOptions?.Invoke(odataOptions);
             
@@ -24,5 +24,4 @@ namespace Scrima.OData.Swashbuckle
             options.MapType<FilterQueryOption>(() => new OpenApiSchema());
             options.MapType<OrderByQueryOption>(() => new OpenApiSchema());
         }
-    }
 }

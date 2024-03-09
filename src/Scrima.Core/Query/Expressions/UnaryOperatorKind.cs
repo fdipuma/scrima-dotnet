@@ -1,13 +1,12 @@
-namespace Scrima.Core.Query.Expressions
+namespace Scrima.Core.Query.Expressions;
+
+/// <summary>
+/// The kinds of unary operator.
+/// </summary>
+public enum UnaryOperatorKind
 {
     /// <summary>
-    /// The kinds of unary operator.
+    /// The unary kind is not.
     /// </summary>
-    public enum UnaryOperatorKind
-    {
-        /// <summary>
-        /// The unary kind is not.
-        /// </summary>
-        Not = 0,
-    }
+    Not = 0,
 }

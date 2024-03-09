@@ -5,33 +5,33 @@ using Scrima.Core.Model;
 using Scrima.Core.Query;
 using Scrima.OData.Parsers;
 
-namespace Scrima.OData
+namespace Scrima.OData;
+
+internal static class ODataQueryParseHelper
 {
-    internal static class ODataQueryParseHelper
+    public static OrderByQueryOption ParseOrderBy(string rawValue, EdmComplexType model)
     {
-        public static OrderByQueryOption ParseOrderBy(string rawValue, EdmComplexType model)
+        OrderByProperty[] properties;
+
+        if (rawValue.Contains(','))
         {
-            OrderByProperty[] properties;
-
-            if (rawValue.Contains(','))
+            properties = rawValue.Split(SplitCharacter.Comma)
+                .Select(raw => ParseOrderByProperty(raw, model))
+                .ToArray();
+        }
+        else
+        {
+            properties = new[]
             {
-                properties = rawValue.Split(SplitCharacter.Comma)
-                    .Select(raw => ParseOrderByProperty(raw, model))
-                    .ToArray();
-            }
-            else
-            {
-                properties = new[]
-                {
-                    ParseOrderByProperty(rawValue, model)
-                };
-            }
-
-            return new OrderByQueryOption(properties);
+                ParseOrderByProperty(rawValue, model)
+            };
         }
 
-        private static OrderByProperty ParseOrderByProperty(string rawValue, EdmComplexType model)
-        {
+        return new OrderByQueryOption(properties);
+    }
+
+    private static OrderByProperty ParseOrderByProperty(string rawValue, EdmComplexType model)
+    {
             if (rawValue == null) throw new ArgumentNullException(nameof(rawValue));
             if (model == null) throw new ArgumentNullException(nameof(model));
 
@@ -63,13 +63,12 @@ namespace Scrima.OData
             return new OrderByProperty(properties, direction);
         }
 
-        public static FilterQueryOption ParseFilter(string rawQuery, EdmComplexType model, EdmTypeProvider typeProvider)
-        {
+    public static FilterQueryOption ParseFilter(string rawQuery, EdmComplexType model, EdmTypeProvider typeProvider)
+    {
             if (rawQuery == null) throw new ArgumentNullException(nameof(rawQuery));
             if (model == null) throw new ArgumentNullException(nameof(model));
             
             var filterExpression = FilterExpressionParser.Parse(rawQuery, model, typeProvider);
             return new FilterQueryOption(filterExpression);
         }
-    }
 }

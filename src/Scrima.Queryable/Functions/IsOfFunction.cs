@@ -2,23 +2,22 @@
 using System.Linq.Expressions;
 using Scrima.Core.Exceptions;
 
-namespace Scrima.Queryable.Functions
+namespace Scrima.Queryable.Functions;
+
+internal class IsOfFunction : ScrimaQueryableFunction
 {
-    internal class IsOfFunction : ScrimaQueryableFunction
+    public override string FunctionName => "isof";
+
+    public override Expression CreateExpression(IList<Expression> arguments)
     {
-        public override string FunctionName => "isof";
+        ValidateParameterCount(arguments, 2);
 
-        public override Expression CreateExpression(IList<Expression> arguments)
+        var typeCheckType = TypeUtilities.ParseTargetType(arguments[1]);
+        if (typeCheckType == null)
         {
-            ValidateParameterCount(arguments, 2);
-
-            var typeCheckType = TypeUtilities.ParseTargetType(arguments[1]);
-            if (typeCheckType == null)
-            {
-                throw new QueryOptionsValidationException("No proper type for type check specified");
-            }
-
-            return Expression.TypeIs(arguments[0], typeCheckType);
+            throw new QueryOptionsValidationException("No proper type for type check specified");
         }
+
+        return Expression.TypeIs(arguments[0], typeCheckType);
     }
 }

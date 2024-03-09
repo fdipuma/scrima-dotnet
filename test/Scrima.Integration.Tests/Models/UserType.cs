@@ -1,9 +1,8 @@
-﻿namespace Scrima.Integration.Tests.Models
+﻿namespace Scrima.Integration.Tests.Models;
+
+public enum UserType
 {
-    public enum UserType
-    {
-        User,
-        Admin,
-        SuperAdmin
-    }
+    User,
+    Admin,
+    SuperAdmin
 }
