@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -32,7 +33,9 @@ namespace Scrima.OData.AspNetCore
                 
                 var queryModelType = bindingContext.ModelType.GetGenericArguments().First();
 
-                var queryOptions = _parser.ParseOptions(queryModelType, rawQuery, _defaultOptions);
+                var odataQueryDefaultOptions = BuildODataQueryDefaultOptions(bindingContext);
+
+                var queryOptions = _parser.ParseOptions(queryModelType, rawQuery, odataQueryDefaultOptions);
                 
                 var odataQuery = (ODataQuery)Activator.CreateInstance(typeof(ODataQuery<>).MakeGenericType(queryModelType));
 
@@ -59,6 +62,21 @@ namespace Scrima.OData.AspNetCore
             }
 
             return Task.CompletedTask;
+        }
+
+        private ODataQueryDefaultOptions BuildODataQueryDefaultOptions(ModelBindingContext bindingContext)
+        {
+            if (bindingContext.ModelMetadata is not DefaultModelMetadata metadata) 
+                return _defaultOptions;
+            
+            var optionsAttribute = metadata.Attributes.Attributes
+                .OfType<ODataQueryDefaultOptionsAttribute>()
+                .FirstOrDefault();
+
+            if (optionsAttribute is null) 
+                return _defaultOptions;
+            
+            return optionsAttribute.BuildOptions(_defaultOptions);
         }
     }
 }

@@ -2,6 +2,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Scrima.Integration.Tests.Controllers;
 using Scrima.Integration.Tests.Initializers;
 using Scrima.Integration.Tests.Models;
 using Scrima.Integration.Tests.Utility;
@@ -22,6 +23,42 @@ namespace Scrima.Integration.Tests
             
             response.Count.Should().BeNull();
             response.Results.Should().HaveCount(testUserCount);
+        }
+        
+        [Fact]
+        public async Task Should_Override_DefaultTop_Settings_Using_Attributes()
+        {
+            const int testUserCount = 10;
+            using var server = SetupSample(Enumerable.Range(1, testUserCount).Select(i => new User()));
+            using var client = server.CreateClient();
+
+            var response = await client.GetQueryAsync<User>("/users/override");
+            
+            response.Results.Should().HaveCount(UsersController.OverriddenDefaultTop);
+        }
+        
+        [Fact]
+        public async Task Should_Override_MaxTop_Settings_Using_Attributes()
+        {
+            const int testUserCount = 10;
+            using var server = SetupSample(Enumerable.Range(1, testUserCount).Select(i => new User()));
+            using var client = server.CreateClient();
+
+            var response = await client.GetQueryAsync<User>("/users/override?$top=10000");
+            
+            response.Results.Should().HaveCount(UsersController.OverriddenMaxTop);
+            
+            response.Count.Should().NotBeNull();
+        }
+        
+        [Fact]
+        public async Task Should_Override_AlwaysShowCount_Settings_Using_Attributes()
+        {
+            const int testUserCount = 10;
+            using var server = SetupSample(Enumerable.Range(1, testUserCount).Select(i => new User()));
+            using var client = server.CreateClient();
+
+            var response = await client.GetQueryAsync<User>("/users/override");
         }
 
         [Fact]
