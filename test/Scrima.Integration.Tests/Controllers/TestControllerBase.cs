@@ -14,6 +14,8 @@ namespace Scrima.Integration.Tests.Controllers
     [Route("[controller]")]
     public abstract class TestControllerBase<T> : Controller where T : class
     {
+        public const int OverriddenDefaultTop = 2;
+        public const int OverriddenMaxTop = 7;
         private readonly DbSet<T> _records;
 
         protected TestControllerBase(DbSet<T> records)
@@ -28,6 +30,19 @@ namespace Scrima.Integration.Tests.Controllers
         {
             var queryResult =
                 await _records.ToQueryResultAsync(queryOptions, GetSearchPredicate() , cancellationToken: cancellationToken);
+
+            return Ok(queryResult);
+        }
+
+        [HttpGet("override")]
+        public async Task<ActionResult<QueryResult<T>>> OverriddenGetAsync(
+            [FromQuery, ODataQueryDefaultOptions(DefaultTop = OverriddenDefaultTop, MaxTop = OverriddenMaxTop, AlwaysShowCount = true)]
+            ODataQuery<T> queryOptions,
+            CancellationToken cancellationToken)
+        {
+            var queryResult =
+                await _records.ToQueryResultAsync(queryOptions, GetSearchPredicate(),
+                    cancellationToken: cancellationToken);
 
             return Ok(queryResult);
         }
