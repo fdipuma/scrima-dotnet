@@ -6,23 +6,23 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Scrima.OData.AspNetCore
-{
-    internal class ODataQueryModelBinder : IModelBinder
-    {
-        private readonly IODataRawQueryParser _parser;
-        private readonly ILogger<ODataQueryModelBinder> _logger;
-        private readonly ODataQueryDefaultOptions _defaultOptions;
+namespace Scrima.OData.AspNetCore;
 
-        public ODataQueryModelBinder(IODataRawQueryParser parser, ILogger<ODataQueryModelBinder> logger, IOptions<ODataQueryDefaultOptions> options)
-        {
+internal class ODataQueryModelBinder : IModelBinder
+{
+    private readonly IODataRawQueryParser _parser;
+    private readonly ILogger<ODataQueryModelBinder> _logger;
+    private readonly ODataQueryDefaultOptions _defaultOptions;
+
+    public ODataQueryModelBinder(IODataRawQueryParser parser, ILogger<ODataQueryModelBinder> logger, IOptions<ODataQueryDefaultOptions> options)
+    {
             _parser = parser;
             _logger = logger;
             _defaultOptions = options.Value;
         }
 
-        public Task BindModelAsync(ModelBindingContext bindingContext)
-        {
+    public Task BindModelAsync(ModelBindingContext bindingContext)
+    {
             if (bindingContext == null) throw new ArgumentNullException(nameof(bindingContext));
 
             if (!bindingContext.ModelType.IsODataQuery()) return Task.CompletedTask;
@@ -64,8 +64,8 @@ namespace Scrima.OData.AspNetCore
             return Task.CompletedTask;
         }
 
-        private ODataQueryDefaultOptions BuildODataQueryDefaultOptions(ModelBindingContext bindingContext)
-        {
+    private ODataQueryDefaultOptions BuildODataQueryDefaultOptions(ModelBindingContext bindingContext)
+    {
             if (bindingContext.ModelMetadata is not DefaultModelMetadata metadata) 
                 return _defaultOptions;
             
@@ -78,5 +78,4 @@ namespace Scrima.OData.AspNetCore
             
             return optionsAttribute.BuildOptions(_defaultOptions);
         }
-    }
 }

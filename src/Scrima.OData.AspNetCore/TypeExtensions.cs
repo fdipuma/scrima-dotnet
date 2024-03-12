@@ -1,16 +1,15 @@
 ﻿using System;
 
-namespace Scrima.OData.AspNetCore
+namespace Scrima.OData.AspNetCore;
+
+internal static class TypeExtensions
 {
-    internal static class TypeExtensions
+    public static bool IsODataQuery(this Type bindingContextModelType)
     {
-        public static bool IsODataQuery(this Type bindingContextModelType)
-        {
-            if (bindingContextModelType is null) return false;
-            
-            return 
-                bindingContextModelType.IsGenericType &&
-                bindingContextModelType.GetGenericTypeDefinition() == typeof(ODataQuery<>);
-        }
+        if (bindingContextModelType is null) return false;
+        
+        return 
+            bindingContextModelType.IsGenericType &&
+            bindingContextModelType.GetGenericTypeDefinition() == typeof(ODataQuery<>);
     }
 }

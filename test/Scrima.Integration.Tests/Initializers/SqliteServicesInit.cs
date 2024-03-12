@@ -3,21 +3,20 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Scrima.Integration.Tests.Data;
 
-namespace Scrima.Integration.Tests.Initializers
+namespace Scrima.Integration.Tests.Initializers;
+
+public class SqliteServicesInit : ServicesInitBase
 {
-    public class SqliteServicesInit : ServicesInitBase
+    private readonly SqliteConnection _connection;
+
+    public SqliteServicesInit()
     {
-        private readonly SqliteConnection _connection;
+        _connection = new SqliteConnection("DataSource=:memory:");
+        _connection.Open();
+    }
 
-        public SqliteServicesInit()
-        {
-            _connection = new SqliteConnection("DataSource=:memory:");
-            _connection.Open();
-        }
-
-        public override void ConfigureServices(IServiceCollection collection)
-        {
-            collection.AddDbContext<BlogDbContext>(o => o.UseSqlite(_connection));
-        }
+    public override void ConfigureServices(IServiceCollection collection)
+    {
+        collection.AddDbContext<BlogDbContext>(o => o.UseSqlite(_connection));
     }
 }

@@ -6,39 +6,38 @@ using Scrima.Integration.Tests.Models;
 using Scrima.Integration.Tests.Utility;
 using Xunit;
 
-namespace Scrima.Integration.Tests
+namespace Scrima.Integration.Tests;
+
+public abstract class SearchTests<TInit> : IntegrationTestBase<TInit> where TInit : ServicesInitBase, new()
 {
-    public abstract class SearchTests<TInit> : IntegrationTestBase<TInit> where TInit : ServicesInitBase, new()
+    [Fact]
+    public async Task Should_ReturnFiltered_When_SearchPartial()
     {
-        [Fact]
-        public async Task Should_ReturnFiltered_When_SearchPartial()
-        {
-            const int testUserCount = 10;
-            using var server =
-                SetupSample(Enumerable.Range(1, testUserCount).Select(i => new User {Username = $"user{i}"}));
-            using var client = server.CreateClient();
+        const int testUserCount = 10;
+        using var server =
+            SetupSample(Enumerable.Range(1, testUserCount).Select(i => new User {Username = $"user{i}"}));
+        using var client = server.CreateClient();
 
-            var response = await client.GetQueryAsync<User>("/users?$search=er2");
+        var response = await client.GetQueryAsync<User>("/users?$search=er2");
 
-            response.Results.Should().HaveCount(1);
-            response.Results[0].Username.Should().Be("user2");
-        }
-
-        [Fact]
-        public async Task Should_UseLastValue_When_SearchUsedMultipleTimes()
-        {
-            const int testUserCount = 10;
-            using var server =
-                SetupSample(Enumerable.Range(1, testUserCount).Select(i => new User {Username = $"user{i}"}));
-            using var client = server.CreateClient();
-
-            var response = await client.GetQueryAsync<User>("/users?$search=er3&$search=er2");
-
-            response.Results.Should().HaveCount(1);
-            response.Results[0].Username.Should().Be("user2");
-        }
+        response.Results.Should().HaveCount(1);
+        response.Results[0].Username.Should().Be("user2");
     }
-    
-    public class InMemorySearchTests : SearchTests<InMemoryServicesInit> { }
-    public class SqliteSearchTests : SearchTests<SqliteServicesInit> { }
+
+    [Fact]
+    public async Task Should_UseLastValue_When_SearchUsedMultipleTimes()
+    {
+        const int testUserCount = 10;
+        using var server =
+            SetupSample(Enumerable.Range(1, testUserCount).Select(i => new User {Username = $"user{i}"}));
+        using var client = server.CreateClient();
+
+        var response = await client.GetQueryAsync<User>("/users?$search=er3&$search=er2");
+
+        response.Results.Should().HaveCount(1);
+        response.Results[0].Username.Should().Be("user2");
+    }
 }
+    
+public class InMemorySearchTests : SearchTests<InMemoryServicesInit> { }
+public class SqliteSearchTests : SearchTests<SqliteServicesInit> { }

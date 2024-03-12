@@ -12,71 +12,70 @@ using Scrima.Integration.Tests.Models;
 using Scrima.OData.AspNetCore;
 using Scrima.OData.Swashbuckle;
 
-namespace Scrima.Integration.Tests
+namespace Scrima.Integration.Tests;
+
+public abstract class IntegrationTestBase<TInit> where TInit : ServicesInitBase, new()
 {
-    public abstract class IntegrationTestBase<TInit> where TInit : ServicesInitBase, new()
+    protected static TestServer SetupSample(
+        IEnumerable<User> testdata = null,
+        Action<WebHostBuilder> setup = null
+    )
     {
-        protected static TestServer SetupSample(
-            IEnumerable<User> testdata = null,
-            Action<WebHostBuilder> setup = null
-        )
+        var builder = new WebHostBuilder();
+        builder.UseStartup<Startup>();
+
+        var initializer = new TInit();
+        builder.ConfigureServices(initializer.ConfigureServices);
+        setup?.Invoke(builder);
+
+        var server = new TestServer(builder);
+        if (testdata != null)
         {
-            var builder = new WebHostBuilder();
-            builder.UseStartup<Startup>();
-
-            var initializer = new TInit();
-            builder.ConfigureServices(initializer.ConfigureServices);
-            setup?.Invoke(builder);
-
-            var server = new TestServer(builder);
-            if (testdata != null)
+            using (var scope = server.Services.CreateScope())
             {
-                using (var scope = server.Services.CreateScope())
-                {
-                    var context = scope.ServiceProvider.GetRequiredService<BlogDbContext>();
-                    context.Database.EnsureCreated();
-                    context.Users.AddRange(testdata);
-                    context.SaveChanges();
-                }
+                var context = scope.ServiceProvider.GetRequiredService<BlogDbContext>();
+                context.Database.EnsureCreated();
+                context.Users.AddRange(testdata);
+                context.SaveChanges();
             }
-
-            var lifetime = server.Services.GetRequiredService<IHostApplicationLifetime>();
-
-            lifetime.ApplicationStopping.Register(() =>
-            {
-                initializer.OnStop(server.Services);
-            });
-            
-            return server;
         }
+
+        var lifetime = server.Services.GetRequiredService<IHostApplicationLifetime>();
+
+        lifetime.ApplicationStopping.Register(() =>
+        {
+            initializer.OnStop(server.Services);
+        });
+        
+        return server;
+    }
+}
+
+public class Startup
+{
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddControllers();
+        services.AddODataQuery();
+        services.AddSwaggerGen(s =>
+        {
+            s.SwaggerDoc("odata", new OpenApiInfo {Title = "odata test", Version = "1"});
+            s.AddScrimaOData(p =>
+            {
+                p.ConfigureOptionsPerType = (options, type) =>
+                {
+                    options.AllowSkipToken = type == typeof(BlogPost);
+                };
+            });
+        });
     }
 
-    public class Startup
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddControllers();
-            services.AddODataQuery();
-            services.AddSwaggerGen(s =>
-            {
-                s.SwaggerDoc("odata", new OpenApiInfo {Title = "odata test", Version = "1"});
-                s.AddScrimaOData(p =>
-                {
-                    p.ConfigureOptionsPerType = (options, type) =>
-                    {
-                        options.AllowSkipToken = type == typeof(BlogPost);
-                    };
-                });
-            });
-        }
+        app.UseRouting();
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            app.UseRouting();
+        app.UseSwagger();
 
-            app.UseSwagger();
-
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-        }
+        app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
     }
 }

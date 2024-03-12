@@ -3,20 +3,19 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Scrima.Integration.Tests.Data;
 
-namespace Scrima.Integration.Tests.Initializers
+namespace Scrima.Integration.Tests.Initializers;
+
+public class InMemoryServicesInit : ServicesInitBase
 {
-    public class InMemoryServicesInit : ServicesInitBase
+    private readonly string _databaseName;
+
+    public InMemoryServicesInit()
     {
-        private readonly string _databaseName;
+        _databaseName = "Blog_" + Guid.NewGuid();
+    }
 
-        public InMemoryServicesInit()
-        {
-            _databaseName = "Blog_" + Guid.NewGuid();
-        }
-
-        public override void ConfigureServices(IServiceCollection collection)
-        {
-            collection.AddDbContext<BlogDbContext>(o => o.UseInMemoryDatabase(_databaseName));
-        }
+    public override void ConfigureServices(IServiceCollection collection)
+    {
+        collection.AddDbContext<BlogDbContext>(o => o.UseInMemoryDatabase(_databaseName));
     }
 }

@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 
-namespace Scrima.Integration.Tests.Models
+namespace Scrima.Integration.Tests.Models;
+
+public class QueryResultDto<T>
 {
-    public class QueryResultDto<T>
-    {
-        public List<T> Results { get; set; }
-        public long? Count { get; set; }
-    }
+    public List<T> Results { get; set; }
+    public long? Count { get; set; }
 }

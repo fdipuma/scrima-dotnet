@@ -1,10 +1,11 @@
 <Project>
   <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <NoWarn>$(NoWarn);1591</NoWarn>    
     <Authors>Federico Dipuma</Authors>
     <Description>OData query parser and executor for .NET Core</Description>
-    <Copyright>(C) 2021 Federico Dipuma</Copyright>
+    <Copyright>(C) 2024 Federico Dipuma</Copyright>
     <PackageProjectUrl>https://github.com/fdipuma/scrima-dotnet</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/fdipuma/scrima-dotnet</RepositoryUrl>
