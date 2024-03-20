@@ -9,6 +9,7 @@ public static class TypeUtilities
     public static readonly Type DoubleType = typeof(double);
     public static readonly Type DateTimeOffsetType = typeof(DateTimeOffset);
     public static readonly Type DateTimeType = typeof(DateTime);
+    public static readonly Type DateOnlyType = typeof(DateOnly);
 
     public static bool IsEnumOrNullableEnum(Type itemType, out Type enumType)
     {
@@ -58,7 +59,7 @@ public static class TypeUtilities
         {
             "Boolean" => typeof(bool),
             "Byte" => typeof(byte),
-            "Date" => DateTimeType,
+            "Date" => DateOnlyType,
             "DateTimeOffset" => DateTimeOffsetType,
             "Decimal" => typeof(decimal),
             "Double" => DoubleType,
@@ -70,7 +71,7 @@ public static class TypeUtilities
             "SByte" => typeof(sbyte),
             "Single" => typeof(float),
             "String" => StringType,
-            "TimeOfDay" => typeof(TimeSpan),
+            "TimeOfDay" => typeof(TimeOnly),
             _ => null
         };
     }

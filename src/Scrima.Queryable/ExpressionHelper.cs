@@ -86,6 +86,28 @@ internal static class ExpressionHelper
             }
         }
 
+        if (toPromotePrimiveType == typeof(DateOnly) &&
+            (otherPrimitiveType == typeof(DateTime) || otherPrimitiveType == typeof(DateTimeOffset)))
+        {
+            if (toPromote is ConstantExpression constant) // we can promote only ConstantsExpressions from DateOnly
+            {
+                if (constant.Value is null)
+                {
+                    return constant;
+                }
+
+                var dateOnlyValue = (DateOnly)constant.Value;
+
+                var dateTimeValue = dateOnlyValue.ToDateTime(TimeOnly.MinValue, DateTimeKind.Local);
+
+                var convertedValue = otherPrimitiveType == typeof(DateTimeOffset)
+                    ? (object)new DateTimeOffset(dateTimeValue)
+                    : dateTimeValue;
+
+                return Expression.Constant(convertedValue, otherNullableType ?? otherPrimitiveType);
+            }
+        }
+
         if (toPromotePrimiveType == typeof(DateTime) && otherPrimitiveType == typeof(DateTimeOffset))
         {
             return ConvertExpression(toPromote, toPromoteIsNullable, otherPrimitiveType, otherNullableType);

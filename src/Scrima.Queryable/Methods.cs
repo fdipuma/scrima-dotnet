@@ -112,6 +112,15 @@ internal static class Methods
 
     public static readonly MemberInfo DateTimeMilliseconds =
         ReflectionHelper.GetMember<DateTime, int>(x => x.Millisecond);
+    
+    public static readonly MemberInfo DateOnlyDay =
+        ReflectionHelper.GetMember<DateOnly, int>(x => x.Day);
+
+    public static readonly MemberInfo DateOnlyMonth =
+        ReflectionHelper.GetMember<DateOnly, int>(x => x.Month);
+
+    public static readonly MemberInfo DateOnlyYear =
+        ReflectionHelper.GetMember<DateOnly, int>(x => x.Year);
 
     public static readonly MemberInfo TimeSpanTotalMinutes =
         ReflectionHelper.GetMember<TimeSpan, double>(x => x.TotalMinutes);
