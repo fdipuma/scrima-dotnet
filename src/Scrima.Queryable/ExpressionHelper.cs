@@ -48,11 +48,8 @@ internal static class ExpressionHelper
     /// <returns></returns>
     public static Expression Promote(Expression toPromote, Expression other)
     {
-        return Promote(toPromote, other.Type);
-    }
-
-    private static Expression Promote(Expression toPromote, Type otherExpressionType)
-    {
+        var otherExpressionType = other.Type;
+        
         if (toPromote.Type == otherExpressionType)
         {
             return toPromote;
@@ -86,7 +83,109 @@ internal static class ExpressionHelper
             }
         }
 
-        if (toPromotePrimiveType == typeof(DateTime) && otherPrimitiveType == typeof(DateTimeOffset))
+        if (toPromotePrimiveType == TypeUtilities.DateOnlyType && (otherPrimitiveType == TypeUtilities.DateTimeType ||
+                                                                   otherPrimitiveType == TypeUtilities.DateTimeOffsetType))
+        {
+            // we support constant values directly, for other kind of mappings we need to convert DateTime to DateOnly
+            // below
+            if (toPromote is ConstantExpression constant)
+            {
+                if (constant.Value is null)
+                {
+                    return constant;
+                }
+
+                var dateOnlyValue = (DateOnly)constant.Value;
+
+                var dateTimeValue = dateOnlyValue.ToDateTime(new TimeOnly(), DateTimeKind.Local);
+
+                if (otherPrimitiveType == TypeUtilities.DateTimeOffsetType)
+                {
+                    return Expression.Constant(new DateTimeOffset(dateTimeValue),
+                        otherNullableType ?? otherPrimitiveType);
+                }
+
+                return Expression.Constant(dateTimeValue, otherNullableType ?? otherPrimitiveType);
+            }
+        }
+
+        // we can support only conversion to DateOnly from DateTime
+        if (toPromotePrimiveType == TypeUtilities.DateTimeType && otherPrimitiveType == TypeUtilities.DateOnlyType)
+        {
+            if (other is ConstantExpression)
+            {
+                // the other side is a constant expression, it will be converted by this method if possible
+                // on the above if block
+                return toPromote;
+            }
+            
+            // we can short-circuit a constant value
+            if (toPromote is ConstantExpression constant)
+            {
+                if (constant.Value is null)
+                {
+                    return constant;
+                }
+
+                var dateTimeValue = (DateTime)constant.Value;
+
+                var dateOnlyValue = DateOnly.FromDateTime(dateTimeValue);
+
+                return Expression.Constant(dateOnlyValue, otherNullableType ?? otherPrimitiveType);
+            }
+            
+            if (!toPromoteIsNullable)
+            {
+                return ConvertToDateOnlyExpression(toPromote, otherNullableType != null);
+            }
+            
+            var targetType = otherNullableType ?? typeof(Nullable<>).MakeGenericType(otherPrimitiveType);
+                
+            var testExpression = Expression.MakeMemberAccess(toPromote, Methods.NullableDateTimeHasValue);
+            var valueAccess = Expression.MakeMemberAccess(toPromote, Methods.NullableDateTimeValue);
+            var convertedValueAccess = ConvertToDateOnlyExpression(valueAccess, true);
+            var nullConstant = Expression.Constant(null, targetType);
+
+            return Expression.Condition(
+                testExpression,
+                convertedValueAccess,
+                nullConstant,
+                targetType
+            );
+        }
+
+        if (toPromotePrimiveType == TypeUtilities.DateTimeOffsetType && otherPrimitiveType == TypeUtilities.DateOnlyType)
+        {
+            if (other is ConstantExpression)
+            {
+                // the other side is a constant expression, it will be converted by this method if possible
+                // on the above if block
+                return toPromote;
+            }
+            
+            // we can short-circuit a constant value
+            if (toPromote is ConstantExpression constant)
+            {
+                if (constant.Value is null)
+                {
+                    return constant;
+                }
+
+                var dateTimeValue = (DateTimeOffset)constant.Value;
+
+                var dateOnlyValue = DateOnly.FromDateTime(dateTimeValue.LocalDateTime);
+
+                return Expression.Constant(dateOnlyValue, otherNullableType ?? otherPrimitiveType);
+            }
+
+            // WARNING: this is a workaround because there is no real option in LINQ to convert a DateOnly into a DateTimeOffset
+            // and vice-versa. This double cast will work with EF Core SQL Server (and maybe other providers)
+            // but not on other IQueryable providers (including InMemory)
+            var castToObject = Expression.Convert(toPromote, typeof(object));
+            return ConvertExpression(castToObject, toPromoteIsNullable, otherPrimitiveType, otherNullableType);
+        }
+        
+        if (toPromotePrimiveType == TypeUtilities.DateTimeType && otherPrimitiveType == TypeUtilities.DateTimeOffsetType)
         {
             return ConvertExpression(toPromote, toPromoteIsNullable, otherPrimitiveType, otherNullableType);
         }
@@ -288,5 +387,25 @@ internal static class ExpressionHelper
         }
 
         return Expression.Convert(argument, targetType);
+    }
+    
+    private static Expression ConvertToDateOnlyExpression(Expression argument, bool isNullable)
+    {
+        var fromDateTimeExpression = Expression.Call(
+            argument,
+            Methods.DateOnlyFromDateTime
+        );
+
+        if (isNullable)
+        {
+            return ConvertExpression(
+                fromDateTimeExpression, 
+                false, 
+                TypeUtilities.DateOnlyType, 
+                typeof(DateOnly?)
+            );
+        }
+        
+        return fromDateTimeExpression;
     }
 }

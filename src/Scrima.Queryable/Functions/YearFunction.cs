@@ -11,6 +11,11 @@ internal class YearFunction : ScrimaQueryableFunction
     {
         ValidateParameterCount(arguments, 1);
 
+        if (arguments[0].Type == TypeUtilities.DateOnlyType)
+        {
+            return Expression.MakeMemberAccess(arguments[0], Methods.DateOnlyYear);
+        }
+
         if (arguments[0].Type == TypeUtilities.DateTimeType)
         {
             return Expression.MakeMemberAccess(arguments[0], Methods.DateTimeYear);

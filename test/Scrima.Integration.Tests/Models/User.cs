@@ -15,8 +15,7 @@ public class User : Person
     public string Username { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; }
-    [Column(TypeName = "datetime")]
-    public DateTime RegistrationDate { get; set; }
+    public DateOnly RegistrationDate { get; set; }
         
     public UserType Type { get; set; }
     public UserType SecondaryType { get; set; }

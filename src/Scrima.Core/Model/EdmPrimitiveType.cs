@@ -32,7 +32,7 @@ public sealed class EdmPrimitiveType : EdmType
     /// <summary>
     /// Gets the EdmType which represents date with values ranging from January 1; 1753 A.D. through December 9999 A.D.
     /// </summary>
-    public static EdmType Date { get; } = new EdmPrimitiveType("Date", "Edm.Date", typeof(DateTime));
+    public static EdmType Date { get; } = new EdmPrimitiveType("Date", "Edm.Date", typeof(DateOnly));
 
     /// <summary>
     /// Gets the EdmType which represents date and time as an Offset in minutes from GMT; with values ranging from 12:00:00 midnight; January 1; 1753 A.D. through 11:59:59 P.M; December 9999 A.D.
@@ -93,7 +93,7 @@ public sealed class EdmPrimitiveType : EdmType
     /// <summary>
     /// Gets the EdmType which represents the time of day with values ranging from 0:00:00.x to 23:59:59.y, where x and y depend upon the precision.
     /// </summary>
-    public static EdmType TimeOfDay { get; } = new EdmPrimitiveType("TimeOfDay", "Edm.TimeOfDay", typeof(TimeSpan));
+    public static EdmType TimeOfDay { get; } = new EdmPrimitiveType("TimeOfDay", "Edm.TimeOfDay", typeof(TimeOnly));
 
     public override int GetHashCode() => Name.GetHashCode();
 }
