@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
+using Scrima.Integration.Tests.Data;
 using Scrima.Integration.Tests.Initializers;
 using Scrima.Integration.Tests.Models;
 using Scrima.Integration.Tests.Utility;
@@ -25,7 +27,7 @@ public abstract class DateFilterTests<TInit> : IntegrationTestBase<TInit> where 
     }
 
     [Fact]
-    public async Task Should_ReturnFiltered_When_FilteringOnDate()
+    public async Task Should_ReturnFiltered_When_FilteringOnDateTimeOffset()
     {
         const int testUserCount = 10;
         using var server = SetupSample(CreateUsers(testUserCount));
@@ -41,6 +43,18 @@ public abstract class DateFilterTests<TInit> : IntegrationTestBase<TInit> where 
     }
 
     [Fact]
+    public async Task Should_ReturnFiltered_When_FilteringOnDateTimeOffset_WithoutTime()
+    {
+        const int testUserCount = 10;
+        using var server = SetupSample(CreateUsers(testUserCount));
+        using var client = server.CreateClient();
+
+        var response = await client.GetQueryAsync<User>($"/users?$filter=createdAt gt 2021-01-05");
+
+        response.Results.Should().HaveCount(6);
+    }
+
+    [Fact]
     public async Task Should_ReturnFiltered_When_FilteringOnDateWithoutTime()
     {
         const int testUserCount = 10;
@@ -52,7 +66,19 @@ public abstract class DateFilterTests<TInit> : IntegrationTestBase<TInit> where 
         response.Results.Should().HaveCount(5);
     }
 
-    private static IEnumerable<User> CreateUsers(int testUserCount) =>
+    [Fact(Skip = "EF Core support for DateTimeOffset and DateOnly comparison is not complete")]
+    public async Task Should_ReturnNone_When_FilteringDateAndDateTimeOffset_WithFalseCondition()
+    {
+        const int testUserCount = 10;
+        using var server = SetupSample(CreateUsers(testUserCount));
+        using var client = server.CreateClient();
+        
+        var response = await client.GetQueryAsync<User>($"/users?$filter=registrationDate gt createdAt");
+
+        response.Results.Should().HaveCount(0);
+    }
+
+    protected static IEnumerable<User> CreateUsers(int testUserCount) =>
         Enumerable.Range(1, testUserCount).Select(i => new User
         {
             Username = $"user{i}",
@@ -60,7 +86,8 @@ public abstract class DateFilterTests<TInit> : IntegrationTestBase<TInit> where 
             FirstName = $"Jon{i}",
             LastName = $"Smith{i}",
             CreatedAt = new DateTimeOffset(2021, 1, i, 10, 0, 0, TimeSpan.Zero),
-            RegistrationDate = new DateTime(2021, 1, i, 0, 0, 0),
+            //CreatedAt = new DateTime(2021, 1, i, 10, 0, 0),
+            RegistrationDate = new DateOnly(2021, 1, i),
             Engagement = 0.2 + i,
             PayedAmout = (i % 2) * 25.30m,
             Blogs = new List<Blog>
@@ -83,10 +110,10 @@ public abstract class DateFilterTests<TInit> : IntegrationTestBase<TInit> where 
             }
         });
 }
-    
-public class InMemoryDateFilterTests : DateFilterTests<InMemoryServicesInit> { }
-    
+
+public class InMemoryDateFilterTests : DateFilterTests<InMemoryServicesInit>;
+
 /// <summary>
 /// replace internal modifier with public to run tests on SqlServer
 /// </summary>
-internal class SqlServerDateFilterTests : DateFilterTests<SqlServerServicesInit> { }
+internal class SqlServerDateFilterTests : DateFilterTests<SqlServerServicesInit>;

@@ -122,6 +122,12 @@ internal static class Methods
     public static readonly MemberInfo DateOnlyYear =
         ReflectionHelper.GetMember<DateOnly, int>(x => x.Year);
 
+    public static readonly MemberInfo NullableDateTimeHasValue =
+        ReflectionHelper.GetMember<DateTime?, bool>(x => x.HasValue);
+
+    public static readonly MemberInfo NullableDateTimeValue =
+        ReflectionHelper.GetMember<DateTime?, DateTime>(x => x.Value);
+
     public static readonly MemberInfo TimeSpanTotalMinutes =
         ReflectionHelper.GetMember<TimeSpan, double>(x => x.TotalMinutes);
 
@@ -136,6 +142,9 @@ internal static class Methods
 
     public static readonly MethodInfo ObjectToString =
         ReflectionHelper.GetMethod<object, string>(o => o.ToString());
+
+    public static readonly MethodInfo DateOnlyFromDateTime =
+        ReflectionHelper.GetMethod(() => DateOnly.FromDateTime(DateTime.MinValue));
 
     public static readonly MethodInfo HasFlag =
         typeof(Enum).GetMethod(nameof(Enum.HasFlag), BindingFlags.Static | BindingFlags.Public);

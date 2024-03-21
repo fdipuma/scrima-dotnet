@@ -314,7 +314,7 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
             LastName = $"Smith{i}",
             DomainId = $"Smith/{i}",
             CreatedAt = new DateTimeOffset(2021, 1, i, 10, 0, 0, TimeSpan.Zero),
-            RegistrationDate = new DateTime(2021, 1, i, 0, 0, 0),
+            RegistrationDate = new DateOnly(2021, 1, i),
             Engagement = 0.2 + i,
             PayedAmout = (i % 2) * 25.30m,
             Blogs = new List<Blog>

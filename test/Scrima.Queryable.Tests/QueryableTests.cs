@@ -35,7 +35,8 @@ public class QueryableTests
                     },
                 NestedModel = new NestedModel {Id = 99, Name = "Element 99"},
                 OptionalDateTimeOffset = new DateTimeOffset(2020, 01, 01, 0, 0, 0, TimeSpan.Zero),
-                OptionalDateTime = new DateTime(2020, 01, 01, 0, 0, 0)
+                OptionalDateTime = new DateTime(2020, 01, 01, 0, 0, 0),
+                OptionalDateOnly = new DateOnly(2020, 01, 01),
                 
             },
             new TestModel
@@ -71,7 +72,8 @@ public class QueryableTests
                 EnumValue = TestEnum.SecondValue,
                 OptionalEnumValue = TestEnum.SecondValue,
                 OptionalDateTimeOffset = new DateTimeOffset(2021, 02, 01, 0, 0, 0, TimeSpan.Zero),
-                OptionalDateTime = new DateTime(2021, 02, 01, 0, 0, 0)
+                OptionalDateTime = new DateTime(2021, 02, 01, 0, 0, 0),
+                OptionalDateOnly = new DateOnly(2021, 02, 01)
             }
         };
 
@@ -564,6 +566,72 @@ public class QueryableTests
                     ),
                     BinaryOperatorKind.GreaterThan,
                     ConstantNode.Date("2020-01-15", new DateOnly(2020, 01, 15)))
+            ),
+            new OrderByQueryOption(Enumerable.Empty<OrderByProperty>()),
+            null,
+            0,
+            null,
+            10,
+            true
+        );
+
+        var results = _queryable.ToQueryResult(query);
+
+        results.Results.Should().ContainSingle();
+        results.Count.Should().Be(1);
+        var value = results.Results.First();
+        value.Id.Should().Be(3);
+    }
+
+    [Fact]
+    public void Should_filter_on_date_property_when_input_is_date()
+    {
+        var query = new QueryOptions(
+            _edmType,
+            new FilterQueryOption(
+                new BinaryOperatorNode(
+                    new PropertyAccessNode(
+                        new[]
+                        {
+                            new EdmProperty(nameof(TestModel.OptionalDateOnly), EdmPrimitiveType.Date,
+                                _edmType)
+                        }
+                    ),
+                    BinaryOperatorKind.GreaterThan,
+                    ConstantNode.Date("2020-01-15", new DateOnly(2020, 01, 15)))
+            ),
+            new OrderByQueryOption(Enumerable.Empty<OrderByProperty>()),
+            null,
+            0,
+            null,
+            10,
+            true
+        );
+
+        var results = _queryable.ToQueryResult(query);
+
+        results.Results.Should().ContainSingle();
+        results.Count.Should().Be(1);
+        var value = results.Results.First();
+        value.Id.Should().Be(3);
+    }
+
+    [Fact]
+    public void Should_filter_on_date_property_when_input_is_datetimeoffset()
+    {
+        var query = new QueryOptions(
+            _edmType,
+            new FilterQueryOption(
+                new BinaryOperatorNode(
+                    new PropertyAccessNode(
+                        new[]
+                        {
+                            new EdmProperty(nameof(TestModel.OptionalDateOnly), EdmPrimitiveType.Date,
+                                _edmType)
+                        }
+                    ),
+                    BinaryOperatorKind.GreaterThan,
+                    ConstantNode.DateTimeOffset("2020-01-15T00:00:00Z", new DateTimeOffset(2020, 01, 15, 0, 0, 0, TimeSpan.Zero)))
             ),
             new OrderByQueryOption(Enumerable.Empty<OrderByProperty>()),
             null,
