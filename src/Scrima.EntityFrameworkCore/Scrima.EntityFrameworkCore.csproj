@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>8.0.0100</Version>
+    <Version>8.0.0200</Version>
     <Title>Scrima.NET execution engine for EntityFramework Core</Title>
   </PropertyGroup>
 

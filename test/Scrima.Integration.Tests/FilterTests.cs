@@ -62,6 +62,19 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
     }
 
     [Fact]
+    public async Task Should_ReturnFilteredStream_When_FilteringOnEqualsString_And_Using_AsyncEnumerable()
+    {
+        const int testUserCount = 10;
+        using var server = SetupSample(CreateUsers(testUserCount));
+        using var client = server.CreateClient();
+
+        var response = await client.GetStreamAsync<User>("/users/stream?$filter=username eq 'user4'");
+
+        response.Should().ContainSingle();
+        response[0].Username.Should().Be("user4");
+    }
+
+    [Fact]
     public async Task Should_ReturnFiltered_When_FilteringOnEqualsString_On_Superclass_Property()
     {
         const int testUserCount = 10;

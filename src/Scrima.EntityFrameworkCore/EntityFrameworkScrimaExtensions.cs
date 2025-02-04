@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -25,6 +26,20 @@ public static class EntityFrameworkScrimaExtensions
             EntityFrameworkQueryableExtensions.LongCountAsync,
             searchPredicate,
             cancellationToken
+        );
+    }
+    
+    public static IAsyncEnumerable<T> AsAsyncEnumerable<T>(this IQueryable<T> source,
+        QueryOptions queryOptions, Expression<Func<T, string, bool>> searchPredicate = null)
+    {
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        if (queryOptions == null) throw new ArgumentNullException(nameof(queryOptions));
+
+        return ScrimaExtensions.AsAsyncEnumerableInternal(
+            source,
+            queryOptions,
+            EntityFrameworkQueryableExtensions.AsAsyncEnumerable,
+            searchPredicate
         );
     }
 }

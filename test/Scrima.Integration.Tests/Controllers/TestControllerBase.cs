@@ -29,7 +29,15 @@ public abstract class TestControllerBase<T> : Controller where T : class
         CancellationToken cancellationToken)
     {
         var queryResult =
-            await _records.ToQueryResultAsync(queryOptions, GetSearchPredicate() , cancellationToken: cancellationToken);
+            await _records.ToQueryResultAsync(queryOptions, GetSearchPredicate(), cancellationToken: cancellationToken);
+
+        return Ok(queryResult);
+    }
+
+    [HttpGet("stream")]
+    public ActionResult<QueryResult<T>> GetStreamAsync([FromQuery] ODataQuery<T> queryOptions)
+    {
+        var queryResult = _records.AsAsyncEnumerable(queryOptions, GetSearchPredicate());
 
         return Ok(queryResult);
     }

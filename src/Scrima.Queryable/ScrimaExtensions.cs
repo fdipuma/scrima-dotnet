@@ -73,6 +73,39 @@ public static partial class ScrimaExtensions
         return new QueryResult<T>(result, count);
     }
 
+    /// <summary>
+    /// This method is used by friendly assemblies to implement the AsyncEnumerable version. This is usually done
+    /// because async counterpars (AsAsyncEnumerable, etc) are available only on specific frameworks
+    /// (e.g. Entity Framework, EF Core, Hibernate). 
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="queryOptions"></param>
+    /// <param name="asAsyncEnumerable"></param>
+    /// <param name="searchPredicate"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static IAsyncEnumerable<T> AsAsyncEnumerableInternal<T>(IQueryable<T> source, 
+        QueryOptions queryOptions,
+        Func<IQueryable<T>, IAsyncEnumerable<T>> asAsyncEnumerable,
+        Expression<Func<T, string, bool>> searchPredicate)
+    {
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        if (queryOptions == null) throw new ArgumentNullException(nameof(queryOptions));
+
+        // The order of applying the items to the IQueryable is important
+        // 1. apply query and order
+        source = ApplyQuery(source, queryOptions, searchPredicate);
+
+        // counting elements is not supported when streaming using IAsyncEnumerable
+        
+        // 2. apply paging on the sorted and filtered result.
+        source = source.Paginate(queryOptions);
+
+        // 3. return async enumerable
+        return asAsyncEnumerable.Invoke(source);
+    }
+
     private static IQueryable<TSource> ApplyQuery<TSource>(IQueryable<TSource> source, QueryOptions queryOptions,
         Expression<Func<TSource, string, bool>> searchPredicate)
     {
@@ -86,7 +119,16 @@ public static partial class ScrimaExtensions
         return source.Search(queryOptions, searchPredicate);
     }
 
-    private static IQueryable<TSource> Search<TSource>(this IQueryable<TSource> source, QueryOptions queryOptions, Expression<Func<TSource, string, bool>> searchPredicate)
+    /// <summary>
+    /// Applies a search predicate to the query if needed
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="queryOptions"></param>
+    /// <param name="searchPredicate"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException">source or queryOptions are null</exception>
+    public static IQueryable<TSource> Search<TSource>(this IQueryable<TSource> source, QueryOptions queryOptions, Expression<Func<TSource, string, bool>> searchPredicate)
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
         if (queryOptions == null) throw new ArgumentNullException(nameof(queryOptions));
