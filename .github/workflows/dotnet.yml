@@ -25,9 +25,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Setup .NET 8
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x    
     - name: Restore dependencies
@@ -39,7 +39,7 @@ jobs:
     - name: Pack
       run: dotnet pack -c $BUILD_CONFIG --no-restore --include-symbols --include-source -o ./nupkg
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:    
         name: nupkg        
         path: ./nupkg/*.nupkg   
@@ -52,7 +52,7 @@ jobs:
     
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: nupkg
           path: ./nupkg
