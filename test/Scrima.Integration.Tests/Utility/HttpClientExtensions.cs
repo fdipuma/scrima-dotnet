@@ -19,6 +19,22 @@ public static class HttpClientExtensions
         string requestUri,
         CancellationToken cancellationToken = default)
     {
+        return await GetAsync<QueryResultDto<T>>(client, requestUri, cancellationToken);
+    }
+
+    public static async Task<T[]> GetStreamAsync<T>(
+        this HttpClient client,
+        string requestUri,
+        CancellationToken cancellationToken = default)
+    {
+        return await GetAsync<T[]>(client, requestUri, cancellationToken);
+    }
+
+    private static async Task<T> GetAsync<T>(
+        this HttpClient client,
+        string requestUri,
+        CancellationToken cancellationToken = default)
+    {
         using var response = await client.GetAsync(requestUri, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
@@ -29,7 +45,7 @@ public static class HttpClientExtensions
         try
         {
             await using var json = await response.Content.ReadAsStreamAsync();
-            return await JsonSerializer.DeserializeAsync<QueryResultDto<T>>(json, SerializerOptions, cancellationToken: cancellationToken);
+            return await JsonSerializer.DeserializeAsync<T>(json, SerializerOptions, cancellationToken: cancellationToken);
         }
         catch (JsonException e)
         {

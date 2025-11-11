@@ -17,10 +17,10 @@ public sealed class ConstantNode : ValueNode
     /// <param name="value">The value.</param>
     public ConstantNode(EdmType edmType, string literalText, object value)
     {
-            EdmType = edmType;
-            LiteralText = literalText;
-            Value = value;
-        }
+        EdmType = edmType;
+        LiteralText = literalText;
+        Value = value;
+    }
 
     /// <summary>
     /// Gets the <see cref="EdmType"/> of the value.
@@ -80,7 +80,8 @@ public sealed class ConstantNode : ValueNode
     /// <param name="literalText">The literal text.</param>
     /// <param name="value">The value.</param>
     /// <returns>A ConstantNode representing a Date value.</returns>
-    public static ConstantNode Date(string literalText, DateTime value) => new ConstantNode(EdmPrimitiveType.Date, literalText, value);
+    public static ConstantNode Date(string literalText, DateOnly value) =>
+        new ConstantNode(EdmPrimitiveType.Date, literalText, value);
 
     /// <summary>
     /// Gets a ConstantNode which represents a DateTimeOffset value.
@@ -88,7 +89,8 @@ public sealed class ConstantNode : ValueNode
     /// <param name="literalText">The literal text.</param>
     /// <param name="value">The value.</param>
     /// <returns>A ConstantNode representing a DateTimeOffset value.</returns>
-    public static ConstantNode DateTimeOffset(string literalText, DateTimeOffset value) => new ConstantNode(EdmPrimitiveType.DateTimeOffset, literalText, value);
+    public static ConstantNode DateTimeOffset(string literalText, DateTimeOffset value) =>
+        new ConstantNode(EdmPrimitiveType.DateTimeOffset, literalText, value);
 
     /// <summary>
     /// Gets a ConstantNode which represents a decimal value.
@@ -96,7 +98,8 @@ public sealed class ConstantNode : ValueNode
     /// <param name="literalText">The literal text.</param>
     /// <param name="value">The value.</param>
     /// <returns>A ConstantNode representing a decimal value.</returns>
-    public static ConstantNode Decimal(string literalText, decimal value) => new ConstantNode(EdmPrimitiveType.Decimal, literalText, value);
+    public static ConstantNode Decimal(string literalText, decimal value) =>
+        new ConstantNode(EdmPrimitiveType.Decimal, literalText, value);
 
     /// <summary>
     /// Gets a ConstantNode which represents a double value.
@@ -104,7 +107,8 @@ public sealed class ConstantNode : ValueNode
     /// <param name="literalText">The literal text.</param>
     /// <param name="value">The value.</param>
     /// <returns>A ConstantNode representing a double value.</returns>
-    public static ConstantNode Double(string literalText, double value) => new ConstantNode(EdmPrimitiveType.Double, literalText, value);
+    public static ConstantNode Double(string literalText, double value) =>
+        new ConstantNode(EdmPrimitiveType.Double, literalText, value);
 
     /// <summary>
     /// Gets a ConstantNode which represents a duration value.
@@ -112,7 +116,8 @@ public sealed class ConstantNode : ValueNode
     /// <param name="literalText">The literal text.</param>
     /// <param name="value">The value.</param>
     /// <returns>A ConstantNode representing a duration value.</returns>
-    public static ConstantNode Duration(string literalText, TimeSpan value) => new ConstantNode(EdmPrimitiveType.Duration, literalText, value);
+    public static ConstantNode Duration(string literalText, TimeSpan value) =>
+        new ConstantNode(EdmPrimitiveType.Duration, literalText, value);
 
     /// <summary>
     /// Gets a ConstantNode which represents a Guid value.
@@ -120,7 +125,8 @@ public sealed class ConstantNode : ValueNode
     /// <param name="literalText">The literal text.</param>
     /// <param name="value">The value.</param>
     /// <returns>A ConstantNode representing a Guid value.</returns>
-    public static ConstantNode Guid(string literalText, Guid value) => new ConstantNode(EdmPrimitiveType.Guid, literalText, value);
+    public static ConstantNode Guid(string literalText, Guid value) =>
+        new ConstantNode(EdmPrimitiveType.Guid, literalText, value);
 
     /// <summary>
     /// Gets a ConstantNode which represents a 32 bit signed integer value.
@@ -128,7 +134,8 @@ public sealed class ConstantNode : ValueNode
     /// <param name="literalText">The literal text.</param>
     /// <param name="value">The value.</param>
     /// <returns>A ConstantNode representing a 32 bit signed integer value.</returns>
-    public static ConstantNode Int32(string literalText, int value) => new ConstantNode(EdmPrimitiveType.Int32, literalText, value);
+    public static ConstantNode Int32(string literalText, int value) =>
+        new ConstantNode(EdmPrimitiveType.Int32, literalText, value);
 
     /// <summary>
     /// Gets a ConstantNode which represents a 64 bit signed integer value.
@@ -136,7 +143,8 @@ public sealed class ConstantNode : ValueNode
     /// <param name="literalText">The literal text.</param>
     /// <param name="value">The value.</param>
     /// <returns>A ConstantNode representing a 64 bit signed integer value.</returns>
-    public static ConstantNode Int64(string literalText, long value) => new ConstantNode(EdmPrimitiveType.Int64, literalText, value);
+    public static ConstantNode Int64(string literalText, long value) =>
+        new ConstantNode(EdmPrimitiveType.Int64, literalText, value);
 
     /// <summary>
     /// Gets a ConstantNode which represents a float value.
@@ -144,7 +152,8 @@ public sealed class ConstantNode : ValueNode
     /// <param name="literalText">The literal text.</param>
     /// <param name="value">The value.</param>
     /// <returns>A ConstantNode representing a float value.</returns>
-    public static ConstantNode Single(string literalText, float value) => new ConstantNode(EdmPrimitiveType.Single, literalText, value);
+    public static ConstantNode Single(string literalText, float value) =>
+        new ConstantNode(EdmPrimitiveType.Single, literalText, value);
 
     /// <summary>
     /// Gets a ConstantNode which represents a string value.
@@ -152,7 +161,8 @@ public sealed class ConstantNode : ValueNode
     /// <param name="literalText">The literal text.</param>
     /// <param name="value">The value.</param>
     /// <returns>A ConstantNode representing a string value.</returns>
-    public static ConstantNode String(string literalText, string value) => new ConstantNode(EdmPrimitiveType.String, literalText, value);
+    public static ConstantNode String(string literalText, string value) =>
+        new ConstantNode(EdmPrimitiveType.String, literalText, value);
 
     /// <summary>
     /// Gets a ConstantNode which represents a time value.
@@ -160,7 +170,8 @@ public sealed class ConstantNode : ValueNode
     /// <param name="literalText">The literal text.</param>
     /// <param name="value">The value.</param>
     /// <returns>A ConstantNode representing a time value.</returns>
-    public static ConstantNode Time(string literalText, TimeSpan value) => new ConstantNode(EdmPrimitiveType.TimeOfDay, literalText, value);
+    public static ConstantNode Time(string literalText, TimeSpan value) =>
+        new ConstantNode(EdmPrimitiveType.TimeOfDay, literalText, value);
 
     /// <summary>
     /// Gets a ConstantNode which represents a time value.

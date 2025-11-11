@@ -15,8 +15,8 @@ internal static class ConstantNodeParser
         switch (token.TokenType)
         {
             case TokenType.Date:
-                var dateTimeValue = DateTime.ParseExact(token.Value, ODataDateFormat, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal);
-                return ConstantNode.Date(token.Value, dateTimeValue);
+                var dateOnlyValue = DateOnly.ParseExact(token.Value, ODataDateFormat, CultureInfo.InvariantCulture);
+                return ConstantNode.Date(token.Value, dateOnlyValue);
 
             case TokenType.DateTimeOffset:
                 var dateTimeOffsetValue = DateTimeOffset.Parse(token.Value, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal);
@@ -63,13 +63,12 @@ internal static class ConstantNodeParser
             case TokenType.Integer:
                 var integerText = token.Value;
 
-                if (integerText == "0")
+                switch (integerText)
                 {
-                    return ConstantNode.Int32Zero;
-                }
-                else if (integerText == "0l" || integerText == "0L")
-                {
-                    return ConstantNode.Int64Zero;
+                    case "0":
+                        return ConstantNode.Int32Zero;
+                    case "0l" or "0L":
+                        return ConstantNode.Int64Zero;
                 }
 
                 var is64BitSuffix = integerText.EndsWith("l", StringComparison.OrdinalIgnoreCase);

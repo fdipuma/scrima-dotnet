@@ -19,7 +19,7 @@ internal class ODataQueryModelBinder : IModelBinder
             _parser = parser;
             _logger = logger;
             _defaultOptions = options.Value;
-        }
+    }
 
     public Task BindModelAsync(ModelBindingContext bindingContext)
     {

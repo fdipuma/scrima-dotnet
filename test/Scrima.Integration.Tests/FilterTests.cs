@@ -62,6 +62,19 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
     }
 
     [Fact]
+    public async Task Should_ReturnFilteredStream_When_FilteringOnEqualsString_And_Using_AsyncEnumerable()
+    {
+        const int testUserCount = 10;
+        using var server = SetupSample(CreateUsers(testUserCount));
+        using var client = server.CreateClient();
+
+        var response = await client.GetStreamAsync<User>("/users/stream?$filter=username eq 'user4'");
+
+        response.Should().ContainSingle();
+        response[0].Username.Should().Be("user4");
+    }
+
+    [Fact]
     public async Task Should_ReturnFiltered_When_FilteringOnEqualsString_On_Superclass_Property()
     {
         const int testUserCount = 10;
@@ -314,7 +327,7 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
             LastName = $"Smith{i}",
             DomainId = $"Smith/{i}",
             CreatedAt = new DateTimeOffset(2021, 1, i, 10, 0, 0, TimeSpan.Zero),
-            RegistrationDate = new DateTime(2021, 1, i, 0, 0, 0),
+            RegistrationDate = new DateOnly(2021, 1, i),
             Engagement = 0.2 + i,
             PayedAmout = (i % 2) * 25.30m,
             Blogs = new List<Blog>
