@@ -1,8 +1,9 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.OpenApi.Readers;
+using Microsoft.OpenApi;
 using Scrima.Integration.Tests.Initializers;
 using Xunit;
 
@@ -10,8 +11,6 @@ namespace Scrima.Integration.Tests;
 
 public class SwaggerTests : IntegrationTestBase<InMemoryServicesInit>
 {
-    private readonly OpenApiStringReader _reader = new OpenApiStringReader();
-
     [Fact]
     public async Task Should_ReturnValidSwaggerSchema()
     {
@@ -24,7 +23,7 @@ public class SwaggerTests : IntegrationTestBase<InMemoryServicesInit>
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         schemaText.Should().NotBeNull();
 
-        var document = _reader.Read(schemaText, out var diagnostic);
+        var (document, diagnostic) = OpenApiDocument.Parse(schemaText, OpenApiConstants.Json);
 
         document.Should().NotBeNull();
         diagnostic.Errors.Should().BeEmpty();
@@ -38,7 +37,8 @@ public class SwaggerTests : IntegrationTestBase<InMemoryServicesInit>
 
         using var response = await client.GetAsync("/swagger/odata/swagger.json");
         var schemaText = await response.Content.ReadAsStringAsync();
-        var document = _reader.Read(schemaText, out var diagnostic);
+
+        var (document, diagnostic) = OpenApiDocument.Parse(schemaText, OpenApiConstants.Json);
 
         var (_, operation) = document.Paths["/Blogs"].Operations.First();
 
@@ -59,7 +59,8 @@ public class SwaggerTests : IntegrationTestBase<InMemoryServicesInit>
 
         using var response = await client.GetAsync("/swagger/odata/swagger.json");
         var schemaText = await response.Content.ReadAsStringAsync();
-        var document = _reader.Read(schemaText, out var diagnostic);
+
+        var (document, diagnostic) = OpenApiDocument.Parse(schemaText, OpenApiConstants.Json);
 
         var (_, operation) = document.Paths["/BlogPosts"].Operations.First();
 
@@ -81,7 +82,8 @@ public class SwaggerTests : IntegrationTestBase<InMemoryServicesInit>
 
         using var response = await client.GetAsync("/swagger/odata/swagger.json");
         var schemaText = await response.Content.ReadAsStringAsync();
-        var document = _reader.Read(schemaText, out var diagnostic);
+
+        var (document, diagnostic) = OpenApiDocument.Parse(schemaText, OpenApiConstants.Json);
 
         document.Components.Schemas.Should().HaveCount(7);
     }

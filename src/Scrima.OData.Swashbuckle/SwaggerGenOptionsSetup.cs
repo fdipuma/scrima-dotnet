@@ -1,6 +1,6 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Scrima.Core.Model;
 using Scrima.Core.Query;
 using Swashbuckle.AspNetCore.SwaggerGen;

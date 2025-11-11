@@ -4,14 +4,14 @@ public class ODataSwaggerOptions
 {
     internal ODataSwaggerOptions()
     {
-            AllowCount = true;
-            AllowSkip = true;
-            AllowSkipToken = false;
-            AllowSearch = true;
-            AllowTop = true;
-            AllowOrderBy = true;
-            AllowFilter = true;
-        }
+        AllowCount = true;
+        AllowSkip = true;
+        AllowSkipToken = false;
+        AllowSearch = true;
+        AllowTop = true;
+        AllowOrderBy = true;
+        AllowFilter = true;
+    }
         
     /// <summary>
     /// Allows to show the $count parameter in schema for the given item type. Defaults to true. 

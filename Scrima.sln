@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11206.111 d18.3
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scrima.Core", "src\Scrima.Core\Scrima.Core.csproj", "{A275D257-AEC9-4AE6-9F5E-173B86F2B505}"
 EndProject
@@ -10,12 +10,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scrima.OData", "src\Scrima.OData\Scrima.OData.csproj", "{855ACE4E-0689-4B8F-9009-98C2A3217FBE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution FIles", "Solution FIles", "{951B82CC-019C-408E-AD33-31454F5FA277}"
-ProjectSection(SolutionItems) = preProject
-	.editorconfig = .editorconfig
-	.gitignore = .gitignore
-	Directory.Build.props = Directory.Build.props
-	README.md = README.md
-EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		README.md = README.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A703C755-A00F-42E0-AA97-9B876360C679}"
 EndProject
@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scrima.OData.Swashbuckle", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scrima.OData.Tests", "test\Scrima.OData.Tests\Scrima.OData.Tests.csproj", "{5AF6765A-376E-42E9-A720-84DDA32DD383}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scrima.Integration.Sample", "test\Scrima.Integration.Sample\Scrima.Integration.Sample.csproj", "{84AAED98-9EB2-4628-BC4C-71BBFC76A69B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,9 +43,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{A275D257-AEC9-4AE6-9F5E-173B86F2B505}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -154,10 +153,25 @@ Global
 		{5AF6765A-376E-42E9-A720-84DDA32DD383}.Release|x64.Build.0 = Release|Any CPU
 		{5AF6765A-376E-42E9-A720-84DDA32DD383}.Release|x86.ActiveCfg = Release|Any CPU
 		{5AF6765A-376E-42E9-A720-84DDA32DD383}.Release|x86.Build.0 = Release|Any CPU
+		{84AAED98-9EB2-4628-BC4C-71BBFC76A69B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84AAED98-9EB2-4628-BC4C-71BBFC76A69B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84AAED98-9EB2-4628-BC4C-71BBFC76A69B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{84AAED98-9EB2-4628-BC4C-71BBFC76A69B}.Debug|x64.Build.0 = Debug|Any CPU
+		{84AAED98-9EB2-4628-BC4C-71BBFC76A69B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{84AAED98-9EB2-4628-BC4C-71BBFC76A69B}.Debug|x86.Build.0 = Debug|Any CPU
+		{84AAED98-9EB2-4628-BC4C-71BBFC76A69B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84AAED98-9EB2-4628-BC4C-71BBFC76A69B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84AAED98-9EB2-4628-BC4C-71BBFC76A69B}.Release|x64.ActiveCfg = Release|Any CPU
+		{84AAED98-9EB2-4628-BC4C-71BBFC76A69B}.Release|x64.Build.0 = Release|Any CPU
+		{84AAED98-9EB2-4628-BC4C-71BBFC76A69B}.Release|x86.ActiveCfg = Release|Any CPU
+		{84AAED98-9EB2-4628-BC4C-71BBFC76A69B}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{71F78DDA-91AA-4457-852E-1132E2235D2F} = {A703C755-A00F-42E0-AA97-9B876360C679}
 		{A275D257-AEC9-4AE6-9F5E-173B86F2B505} = {A703C755-A00F-42E0-AA97-9B876360C679}
+		{71F78DDA-91AA-4457-852E-1132E2235D2F} = {A703C755-A00F-42E0-AA97-9B876360C679}
 		{855ACE4E-0689-4B8F-9009-98C2A3217FBE} = {A703C755-A00F-42E0-AA97-9B876360C679}
 		{BA2DD73A-747D-4171-A2C9-E6AE778306BE} = {A703C755-A00F-42E0-AA97-9B876360C679}
 		{03F3AD2D-6062-42A4-AF15-EF5DB03AF9A9} = {A703C755-A00F-42E0-AA97-9B876360C679}
@@ -165,5 +179,9 @@ Global
 		{2C123987-E92A-4E74-87C3-0C1CBEB3BC89} = {7D967DFE-E7A2-4D32-897D-D4FC3E03E70D}
 		{9EB0F172-6EBB-4C1F-AB97-BF229C28CAF3} = {A703C755-A00F-42E0-AA97-9B876360C679}
 		{5AF6765A-376E-42E9-A720-84DDA32DD383} = {7D967DFE-E7A2-4D32-897D-D4FC3E03E70D}
+		{84AAED98-9EB2-4628-BC4C-71BBFC76A69B} = {7D967DFE-E7A2-4D32-897D-D4FC3E03E70D}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5144A36F-4662-49B2-80A5-84BC404BE9FD}
 	EndGlobalSection
 EndGlobal

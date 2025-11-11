@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Scrima.Integration.Tests.Models;
+using Scrima.Integration.Sample.Models;
 
 namespace Scrima.Integration.Tests.Utility;
 

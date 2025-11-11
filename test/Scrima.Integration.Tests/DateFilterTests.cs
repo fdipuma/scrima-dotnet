@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
-using Scrima.Integration.Tests.Data;
+using Scrima.Integration.Sample.Models;
 using Scrima.Integration.Tests.Initializers;
-using Scrima.Integration.Tests.Models;
 using Scrima.Integration.Tests.Utility;
 using Xunit;
 
@@ -17,8 +15,8 @@ public abstract class DateFilterTests<TInit> : IntegrationTestBase<TInit> where 
     [Fact]
     public async Task Should_ReturnNone_When_FilteringOnDateYear()
     {
-        const int testUserCount = 10;
-        using var server = SetupSample(CreateUsers(testUserCount));
+        const int TestUserCount = 10;
+        using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
 
         var response = await client.GetQueryAsync<User>("/users?$filter=year(createdAt) eq 2020");
@@ -29,8 +27,8 @@ public abstract class DateFilterTests<TInit> : IntegrationTestBase<TInit> where 
     [Fact]
     public async Task Should_ReturnFiltered_When_FilteringOnDateTimeOffset()
     {
-        const int testUserCount = 10;
-        using var server = SetupSample(CreateUsers(testUserCount));
+        const int TestUserCount = 10;
+        using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
 
         var minDate = new DateTimeOffset(2021, 1, 5, 10, 0, 0, TimeSpan.Zero).ToString("O");
@@ -45,8 +43,8 @@ public abstract class DateFilterTests<TInit> : IntegrationTestBase<TInit> where 
     [Fact]
     public async Task Should_ReturnFiltered_When_FilteringOnDateTimeOffset_WithoutTime()
     {
-        const int testUserCount = 10;
-        using var server = SetupSample(CreateUsers(testUserCount));
+        const int TestUserCount = 10;
+        using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
 
         var response = await client.GetQueryAsync<User>($"/users?$filter=createdAt gt 2021-01-05");
@@ -57,8 +55,8 @@ public abstract class DateFilterTests<TInit> : IntegrationTestBase<TInit> where 
     [Fact]
     public async Task Should_ReturnFiltered_When_FilteringOnDateWithoutTime()
     {
-        const int testUserCount = 10;
-        using var server = SetupSample(CreateUsers(testUserCount));
+        const int TestUserCount = 10;
+        using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
         
         var response = await client.GetQueryAsync<User>($"/users?$filter=registrationDate gt 2021-01-05");
@@ -69,8 +67,8 @@ public abstract class DateFilterTests<TInit> : IntegrationTestBase<TInit> where 
     [Fact(Skip = "EF Core support for DateTimeOffset and DateOnly comparison is not complete")]
     public async Task Should_ReturnNone_When_FilteringDateAndDateTimeOffset_WithFalseCondition()
     {
-        const int testUserCount = 10;
-        using var server = SetupSample(CreateUsers(testUserCount));
+        const int TestUserCount = 10;
+        using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
         
         var response = await client.GetQueryAsync<User>($"/users?$filter=registrationDate gt createdAt");

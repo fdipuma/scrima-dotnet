@@ -1,13 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>2.2.0</Version>
+    <Version>3.0.0</Version>
     <Title>Scrima.NET common utilities for OData</Title>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Folder Include="Extensions" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Scrima.Core\Scrima.Core.csproj" />

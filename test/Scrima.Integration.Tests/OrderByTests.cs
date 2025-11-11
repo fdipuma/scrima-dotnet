@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Scrima.Integration.Sample.Models;
 using Scrima.Integration.Tests.Initializers;
-using Scrima.Integration.Tests.Models;
 using Scrima.Integration.Tests.Utility;
 using Xunit;
 
