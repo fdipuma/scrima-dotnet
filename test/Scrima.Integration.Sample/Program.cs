@@ -30,8 +30,6 @@ public class Program
 
         var app = builder.Build();
 
-        
-
         app.UseSwagger(options =>
         {
             options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_1;
