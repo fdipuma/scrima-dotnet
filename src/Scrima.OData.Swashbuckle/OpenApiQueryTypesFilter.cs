@@ -23,6 +23,11 @@ internal class OpenApiQueryTypesFilter : IDocumentFilter, ISchemaFilter
                 value is { })
             .Select(s => s.Key)
             .ToList();
+        
+        if (schemasToRemove is null)
+        {
+            return;
+        }
 
         foreach (var schemaKey in schemasToRemove)
         {
