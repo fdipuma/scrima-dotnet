@@ -1,8 +1,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Scrima.Integration.Sample.Models;
 using Scrima.Integration.Tests.Initializers;
-using Scrima.Integration.Tests.Models;
 using Scrima.Integration.Tests.Utility;
 using Xunit;
 
@@ -13,9 +13,9 @@ public abstract class SearchTests<TInit> : IntegrationTestBase<TInit> where TIni
     [Fact]
     public async Task Should_ReturnFiltered_When_SearchPartial()
     {
-        const int testUserCount = 10;
+        const int TestUserCount = 10;
         using var server =
-            SetupSample(Enumerable.Range(1, testUserCount).Select(i => new User {Username = $"user{i}"}));
+            SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User {Username = $"user{i}"}));
         using var client = server.CreateClient();
 
         var response = await client.GetQueryAsync<User>("/users?$search=er2");
@@ -27,9 +27,9 @@ public abstract class SearchTests<TInit> : IntegrationTestBase<TInit> where TIni
     [Fact]
     public async Task Should_UseLastValue_When_SearchUsedMultipleTimes()
     {
-        const int testUserCount = 10;
+        const int TestUserCount = 10;
         using var server =
-            SetupSample(Enumerable.Range(1, testUserCount).Select(i => new User {Username = $"user{i}"}));
+            SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User {Username = $"user{i}"}));
         using var client = server.CreateClient();
 
         var response = await client.GetQueryAsync<User>("/users?$search=er3&$search=er2");

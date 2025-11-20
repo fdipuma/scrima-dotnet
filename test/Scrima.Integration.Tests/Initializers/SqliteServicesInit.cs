@@ -1,7 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Scrima.Integration.Tests.Data;
+using Scrima.Integration.Sample.Data;
 
 namespace Scrima.Integration.Tests.Initializers;
 
