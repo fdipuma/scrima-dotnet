@@ -16,6 +16,7 @@ public static class SwaggerGenOptionsExtensions
             configureOptions?.Invoke(odataOptions);
             
             options.OperationFilter<QueryOptionsOperationFilter>(odataOptions);
+            options.OperationFilter<EntityPropertiesOperationFilter>(odataOptions);
             options.SchemaFilter<OpenApiQueryTypesFilter>();
             options.DocumentFilter<OpenApiQueryTypesFilter>();
             
