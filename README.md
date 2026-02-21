@@ -46,6 +46,10 @@ public class Startup
                 {
                     options.AllowSkipToken = type == typeof(BlogPost);
                 };
+                
+                // optionally enrich $filter and $orderby Swagger parameters
+                // with the entity's property names and types
+                p.EntityFields.Show = ShowEntityFieldsOptions.OnAllODataFields;
             });
         }
     
@@ -71,6 +75,36 @@ public ActionResult GetAll(ODataQuery<MyModel> query)
     };
 }
 ```
+
+### Swagger Entity Fields Description
+
+When using `Scrima.OData.Swashbuckle`, you can enrich the `$filter` and `$orderby` Swagger parameters with the entity's property names and their JSON types. This makes the API documentation self-descriptive, so consumers can see which fields are available for filtering and ordering directly in Swagger UI.
+
+Configure it via the `EntityFields` property on `ScrimaSwaggerOptions`:
+
+```csharp
+s.AddScrimaOData(p =>
+{
+    // Show entity fields on both $filter and $orderby parameters
+    p.EntityFields.Show = ShowEntityFieldsOptions.OnAllODataFields;
+
+    // Or target specific parameters
+    p.EntityFields.Show = ShowEntityFieldsOptions.OnFilter;
+    p.EntityFields.Show = ShowEntityFieldsOptions.OnOrder;
+
+    // Expose the entity type as an OpenAPI extension (x-odata-entity) — enabled by default
+    p.EntityFields.ExposeAsExtensions = true;
+});
+```
+
+| Option | Description |
+| --- | --- |
+| `ShowEntityFieldsOptions.None` | Disabled (default) |
+| `ShowEntityFieldsOptions.OnFilter` | Append filterable property list to `$filter` description |
+| `ShowEntityFieldsOptions.OnOrder` | Append orderable property list to `$orderby` description |
+| `ShowEntityFieldsOptions.OnAllODataFields` | Enable on both `$filter` and `$orderby` |
+
+When enabled, the operation is also tagged with `x-odata-entity` (the entity's full type name) and `x-odata-filterable-properties` / `x-odata-orderable-properties` extensions, which can be consumed by client generators such as NSwag.
 
 ## Framework features
 

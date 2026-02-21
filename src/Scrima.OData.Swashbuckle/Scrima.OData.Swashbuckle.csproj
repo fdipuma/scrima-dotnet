@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>3.0.0</Version>
+    <Version>3.0.1</Version>
     <OpenApiGenerateDocuments>false</OpenApiGenerateDocuments>
     <Title>Scrima.NET OData Swagger schema for Swashbuckle</Title>
   </PropertyGroup>
