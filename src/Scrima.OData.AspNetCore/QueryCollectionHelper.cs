@@ -15,6 +15,11 @@ internal static class QueryCollectionHelper
 
         StringValues value;
 
+        if (query.TryGetValue(ODataRawQueryOptions.SelectParamName, out value))
+        {
+            options.Select = value.Last();
+        }
+
         if (query.TryGetValue(ODataRawQueryOptions.FilterParamName, out value))
         {
             options.Filter = value.Last();

@@ -42,7 +42,8 @@ public class SwaggerTests : IntegrationTestBase<InMemoryServicesInit>
 
         var (_, operation) = document.Paths["/Blogs"].Operations.First();
 
-        operation.Parameters.Count.ShouldBe(6);
+        operation.Parameters.Count.ShouldBe(7);
+        operation.Parameters.ShouldContain(p => p.Name == "$select");
         operation.Parameters.ShouldContain(p => p.Name == "$filter");
         operation.Parameters.ShouldContain(p => p.Name == "$count");
         operation.Parameters.ShouldContain(p => p.Name == "$search");
@@ -64,7 +65,8 @@ public class SwaggerTests : IntegrationTestBase<InMemoryServicesInit>
 
         var (_, operation) = document.Paths["/BlogPosts"].Operations.First();
 
-        operation.Parameters.Count.ShouldBe(7);
+        operation.Parameters.Count.ShouldBe(8);
+        operation.Parameters.ShouldContain(p => p.Name == "$select");
         operation.Parameters.ShouldContain(p => p.Name == "$filter");
         operation.Parameters.ShouldContain(p => p.Name == "$count");
         operation.Parameters.ShouldContain(p => p.Name == "$search");

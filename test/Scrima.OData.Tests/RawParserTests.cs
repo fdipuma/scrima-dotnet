@@ -6,13 +6,14 @@ namespace Scrima.OData.Tests;
 public class RawParserTests
 {
     [Theory]
-    [InlineData("?$filter=name eq 'Jon'&$count=true&$search=myvalue&$orderby=name asc&$top=10&$skip=5&$skiptoken=mytoken")]
-    [InlineData("$filter=name eq 'Jon'&$count=true&$search=myvalue&$orderby=name asc&$top=10&$skip=5&$skiptoken=mytoken")]
+    [InlineData("?$select=name&$filter=name eq 'Jon'&$count=true&$search=myvalue&$orderby=name asc&$top=10&$skip=5&$skiptoken=mytoken")]
+    [InlineData("$select=name&$filter=name eq 'Jon'&$count=true&$search=myvalue&$orderby=name asc&$top=10&$skip=5&$skiptoken=mytoken")]
     public void Should_ParseRawString_When_AllParametersProvided(string rawQueryString)
     {
         var rawQueryParsed = ODataRawQueryOptions.ParseRawQuery(rawQueryString);
 
         rawQueryParsed.ShouldNotBeNull();
+        rawQueryParsed.Select.ShouldBe("name");
         rawQueryParsed.Count.ShouldBe("true");
         rawQueryParsed.Filter.ShouldBe("name eq 'Jon'");
         rawQueryParsed.Search.ShouldBe("myvalue");

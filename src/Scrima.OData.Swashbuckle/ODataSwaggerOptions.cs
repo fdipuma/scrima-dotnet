@@ -11,6 +11,7 @@ public class ODataSwaggerOptions
         AllowTop = true;
         AllowOrderBy = true;
         AllowFilter = true;
+        AllowSelect = true;
     }
         
     /// <summary>
@@ -41,4 +42,8 @@ public class ODataSwaggerOptions
     /// Allows to show the $orderby parameter in schema for the given item type. Defaults to true. 
     /// </summary>
     public bool AllowOrderBy { get; set; }
+    /// <summary>
+    /// Allows to show the $select parameter in schema for the given item type. Defaults to true. 
+    /// </summary>
+    public bool AllowSelect { get; set; }
 }

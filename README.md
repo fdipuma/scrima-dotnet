@@ -76,6 +76,17 @@ public ActionResult GetAll(ODataQuery<MyModel> query)
 }
 ```
 
+### Selecting properties
+
+`$select` returns items of the same type where only the selected properties are populated; the other properties keep their default values. Nested properties are selected with a path (e.g. `$select=title,blog/name`) and `$select=*` selects all the properties.
+
+The queried type (and any type reached through a selected path) needs a public parameterless constructor and the selected properties must be settable. To omit the properties that were not selected from JSON responses, ignore default values when serializing (selected properties holding a default value are omitted as well):
+
+```csharp
+services.AddControllers()
+    .AddJsonOptions(o => o.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault);
+```
+
 ### Swagger Entity Fields Description
 
 When using `Scrima.OData.Swashbuckle`, you can enrich the `$filter` and `$orderby` Swagger parameters with the entity's property names and their JSON types. This makes the API documentation self-descriptive, so consumers can see which fields are available for filtering and ordering directly in Swagger UI.
@@ -119,8 +130,9 @@ A partial list of supported features is shown above
 | `$top`              | Select the top N elements in the result set                                   | Supported         |
 | `$count`            | Provide the total count of items in the data source (with filters applied)    | Supported         |
 | `$orderby`          | Sorts elements using multiple properties                                      | Supported         |
+| `$select`           | Returns only the selected properties, including nested properties             | Supported         |
 
-Currently only filtering, ordering and paging are supported, other features like `$expand`, `$format` or aggregations are out of scope.
+Currently only filtering, ordering, paging and selecting are supported, other features like `$expand`, `$format` or aggregations are out of scope.
 
 ## OData URL Conventions Compatibility
 
@@ -161,7 +173,7 @@ Currently only filtering, ordering and paging are supported, other features like
 | 5.1.1.15 Path Expressions                             | Partially Supported                                                                      |
 | 5.1.2 System Query Option $filter                     | Supported                                                                                |
 | 5.1.3 System Query Option $expand                     | Supported                                                                                |
-| 5.1.4 System Query Option $select                     | Supported                                                                                |
+| 5.1.4 System Query Option $select                     | Partially Supported (properties and property paths)                                      |
 | 5.1.5 System Query Option $orderby                    | Supported                                                                                |
 | 5.1.6 System Query Options $top and $skip             | Supported                                                                                |
 | 5.1.7 System Query Option $count                      | Supported                                                                                |

@@ -40,16 +40,34 @@ public sealed class EdmComplexType : EdmType
     /// <exception cref="System.ArgumentException">The type does not contain a property with the specified name.</exception>
     public EdmProperty GetProperty(string name)
     {
-        if (name == null) throw new ArgumentNullException(nameof(name));
-            
-        foreach (var property in Properties)
+        if (TryGetProperty(name, out var property))
         {
-            if (string.Equals(name, property.Name, StringComparison.OrdinalIgnoreCase))
-            {
-                return property;
-            }
+            return property;
         }
 
         throw new ArgumentException($"The type '{FullName}' does not contain a property named '{name}'");
+    }
+
+    /// <summary>
+    /// Gets the property with the specified name.
+    /// </summary>
+    /// <param name="name">The name of the property.</param>
+    /// <param name="property">The <see cref="EdmProperty"/> declared in this type with the specified name, if any.</param>
+    /// <returns><c>true</c> if the type contains a property with the specified name; otherwise, <c>false</c>.</returns>
+    public bool TryGetProperty(string name, out EdmProperty property)
+    {
+        if (name == null) throw new ArgumentNullException(nameof(name));
+
+        foreach (var candidate in Properties)
+        {
+            if (string.Equals(name, candidate.Name, StringComparison.OrdinalIgnoreCase))
+            {
+                property = candidate;
+                return true;
+            }
+        }
+
+        property = null;
+        return false;
     }
 }

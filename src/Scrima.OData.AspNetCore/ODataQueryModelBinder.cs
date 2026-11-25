@@ -46,6 +46,7 @@ internal class ODataQueryModelBinder : IModelBinder
                     odataQuery.Skip = queryOptions.Skip;
                     odataQuery.Top = queryOptions.Top;
 
+                    odataQuery.Select = rawQuery.Select;
                     odataQuery.Filter = rawQuery.Filter;
                     odataQuery.Search = rawQuery.Search;
                     odataQuery.OrderBy = rawQuery.OrderBy;

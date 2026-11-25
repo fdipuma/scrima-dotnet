@@ -26,7 +26,10 @@ public static partial class ScrimaExtensions
         // 3. apply paging on the sorted and filtered result.
         source = source.Paginate(queryOptions);
 
-        // 4. materialize results
+        // 4. project the selected properties
+        source = source.Select(queryOptions.Select);
+
+        // 5. materialize results
         var result = source.ToList();
 
         return new QueryResult<T>(result, count);
@@ -67,7 +70,10 @@ public static partial class ScrimaExtensions
         // 3. apply paging on the sorted and filtered result.
         source = source.Paginate(queryOptions);
 
-        // 4. materialize results
+        // 4. project the selected properties
+        source = source.Select(queryOptions.Select);
+
+        // 5. materialize results
         var result = await toListAsync.Invoke(source, cancellationToken);
 
         return new QueryResult<T>(result, count);
@@ -102,7 +108,10 @@ public static partial class ScrimaExtensions
         // 2. apply paging on the sorted and filtered result.
         source = source.Paginate(queryOptions);
 
-        // 3. return async enumerable
+        // 3. project the selected properties
+        source = source.Select(queryOptions.Select);
+
+        // 4. return async enumerable
         return asAsyncEnumerable.Invoke(source);
     }
 
