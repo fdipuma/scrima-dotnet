@@ -1,9 +1,9 @@
 using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Scrima.Integration.Sample.Models;
 using Scrima.Integration.Tests.Initializers;
 using Scrima.Integration.Tests.Utility;
+using Shouldly;
 using Xunit;
 
 namespace Scrima.Integration.Tests;
@@ -18,9 +18,9 @@ public abstract class PaginationTests<TInit> : IntegrationTestBase<TInit> where 
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>($"/users?$skip=1&$skip={SkipCount}");
+        var response = await client.GetQueryAsync<User>($"/users?$skip=1&$skip={SkipCount}", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().HaveCount(TestUserCount - SkipCount);
+        response.Results.Count.ShouldBe(TestUserCount - SkipCount);
     }
 
     [Fact]
@@ -31,9 +31,9 @@ public abstract class PaginationTests<TInit> : IntegrationTestBase<TInit> where 
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>($"/users?$skip={SkipCount}");
+        var response = await client.GetQueryAsync<User>($"/users?$skip={SkipCount}", cancellationToken: TestContext.Current.CancellationToken);
         
-        response.Results.Should().HaveCount(TestUserCount - SkipCount);
+        response.Results.Count.ShouldBe(TestUserCount - SkipCount);
     }
 
     [Fact]
@@ -44,9 +44,9 @@ public abstract class PaginationTests<TInit> : IntegrationTestBase<TInit> where 
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>($"/users?$skip={SkipCount}");
+        var response = await client.GetQueryAsync<User>($"/users?$skip={SkipCount}", cancellationToken: TestContext.Current.CancellationToken);
         
-        response.Results.Should().BeEmpty();
+        response.Results.ShouldBeEmpty();
     }
 
     [Fact]
@@ -57,9 +57,9 @@ public abstract class PaginationTests<TInit> : IntegrationTestBase<TInit> where 
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>($"/users?$top={TopCount}");
+        var response = await client.GetQueryAsync<User>($"/users?$top={TopCount}", cancellationToken: TestContext.Current.CancellationToken);
         
-        response.Results.Should().HaveCount(TopCount);
+        response.Results.Count.ShouldBe(TopCount);
     }
 
     [Fact]
@@ -70,9 +70,9 @@ public abstract class PaginationTests<TInit> : IntegrationTestBase<TInit> where 
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>($"/users?$top={SkipCount}");
+        var response = await client.GetQueryAsync<User>($"/users?$top={SkipCount}", cancellationToken: TestContext.Current.CancellationToken);
         
-        response.Results.Should().HaveCount(TestUserCount);
+        response.Results.Count.ShouldBe(TestUserCount);
     }
 
     [Fact]
@@ -83,9 +83,9 @@ public abstract class PaginationTests<TInit> : IntegrationTestBase<TInit> where 
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>($"/users?$top=1&$top={TopCount}");
+        var response = await client.GetQueryAsync<User>($"/users?$top=1&$top={TopCount}", cancellationToken: TestContext.Current.CancellationToken);
         
-        response.Results.Should().HaveCount(TopCount);
+        response.Results.Count.ShouldBe(TopCount);
     }
 
     [Fact]
@@ -97,9 +97,9 @@ public abstract class PaginationTests<TInit> : IntegrationTestBase<TInit> where 
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>($"/users?$skip={SkipCount}&$top={TopCount}");
+        var response = await client.GetQueryAsync<User>($"/users?$skip={SkipCount}&$top={TopCount}", cancellationToken: TestContext.Current.CancellationToken);
         
-        response.Results.Should().HaveCount(TopCount);
+        response.Results.Count.ShouldBe(TopCount);
     }
 
     [Fact]
@@ -111,9 +111,9 @@ public abstract class PaginationTests<TInit> : IntegrationTestBase<TInit> where 
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>($"/users?$skip={SkipCount}&$top={TopCount}");
+        var response = await client.GetQueryAsync<User>($"/users?$skip={SkipCount}&$top={TopCount}", cancellationToken: TestContext.Current.CancellationToken);
         
-        response.Results.Should().HaveCount(5);
+        response.Results.Count.ShouldBe(5);
     }
 
     [Fact]
@@ -125,9 +125,9 @@ public abstract class PaginationTests<TInit> : IntegrationTestBase<TInit> where 
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>($"/users?$skip={SkipCount}&$top={TopCount}");
+        var response = await client.GetQueryAsync<User>($"/users?$skip={SkipCount}&$top={TopCount}", cancellationToken: TestContext.Current.CancellationToken);
         
-        response.Results.Should().BeEmpty();
+        response.Results.ShouldBeEmpty();
     }
 }
     

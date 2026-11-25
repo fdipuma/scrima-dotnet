@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
-using FluentAssertions;
 using Scrima.Core;
 using Scrima.Core.Model;
 using Scrima.Core.Query;
 using Scrima.Core.Query.Expressions;
+using Shouldly;
 using Xunit;
 
 namespace Scrima.Queryable.Tests;
@@ -105,10 +105,74 @@ public class QueryableTests
 
         var results = _queryable.ToQueryResult(query);
 
-        results.Results.Should().ContainSingle();
-        results.Count.Should().Be(1);
+        results.Results.ShouldHaveSingleItem();
+        results.Count.ShouldBe(1);
         var value = results.Results.First();
-        value.Id.Should().Be(7);
+        value.Id.ShouldBe(7);
+    }
+
+    [Theory]
+    [InlineData(20.51d)]
+    [InlineData(20.51f)]
+    public void Should_filter_on_decimal_property_when_input_is_floating_point(object value)
+    {
+        var literal = value is float singleValue
+            ? ConstantNode.Single("20.51f", singleValue)
+            : ConstantNode.Double("20.51", (double)value);
+
+        var query = new QueryOptions(
+            _edmType,
+            new FilterQueryOption(
+                new BinaryOperatorNode(
+                    new PropertyAccessNode(
+                        [new EdmProperty(nameof(TestModel.Price), EdmPrimitiveType.Decimal, _edmType)]
+                    ),
+                    BinaryOperatorKind.Equal,
+                    literal)
+            ),
+            new OrderByQueryOption(Enumerable.Empty<OrderByProperty>()),
+            null,
+            0,
+            null,
+            10,
+            true
+        );
+
+        var results = _queryable.ToQueryResult(query);
+
+        results.Results.ShouldHaveSingleItem();
+        results.Count.ShouldBe(1);
+        results.Results.First().Id.ShouldBe(3);
+    }
+
+    [Fact]
+    public void Should_filter_on_decimal_property_when_input_is_floating_point_cast_to_decimal()
+    {
+        var cast = new FunctionCallNode("cast");
+        cast.AddParameter(ConstantNode.Double("20.51", 20.51d));
+        cast.AddParameter(ConstantNode.String("'Edm.Decimal'", "Edm.Decimal"));
+
+        var query = new QueryOptions(
+            _edmType,
+            new FilterQueryOption(
+                new BinaryOperatorNode(
+                    new PropertyAccessNode(
+                        new[] {new EdmProperty(nameof(TestModel.Price), EdmPrimitiveType.Decimal, _edmType)}
+                    ),
+                    BinaryOperatorKind.Equal,
+                    cast)
+            ),
+            new OrderByQueryOption(Enumerable.Empty<OrderByProperty>()),
+            null,
+            0,
+            null,
+            10,
+            true
+        );
+
+        var results = _queryable.ToQueryResult(query);
+
+        results.Results.ShouldHaveSingleItem().Id.ShouldBe(3);
     }
 
     [Fact]
@@ -134,10 +198,10 @@ public class QueryableTests
 
         var results = _queryable.ToQueryResult(query);
 
-        results.Results.Should().ContainSingle();
-        results.Count.Should().Be(1);
+        results.Results.ShouldHaveSingleItem();
+        results.Count.ShouldBe(1);
         var value = results.Results.First();
-        value.Id.Should().Be(7);
+        value.Id.ShouldBe(7);
     }
 
     [Fact]
@@ -163,10 +227,10 @@ public class QueryableTests
 
         var results = _queryable.ToQueryResult(query);
 
-        results.Results.Should().ContainSingle();
-        results.Count.Should().Be(1);
+        results.Results.ShouldHaveSingleItem();
+        results.Count.ShouldBe(1);
         var value = results.Results.First();
-        value.Id.Should().Be(7);
+        value.Id.ShouldBe(7);
     }
 
     [Fact]
@@ -192,8 +256,8 @@ public class QueryableTests
 
         var results = _queryable.ToQueryResult(query);
 
-        results.Results.Should().HaveCount(2);
-        results.Count.Should().Be(2);
+        results.Results.Count().ShouldBe(2);
+        results.Count.ShouldBe(2);
     }
 
     [Fact]
@@ -228,10 +292,10 @@ public class QueryableTests
 
         var results = _queryable.ToQueryResult(query);
 
-        results.Results.Should().ContainSingle();
-        results.Count.Should().Be(1);
+        results.Results.ShouldHaveSingleItem();
+        results.Count.ShouldBe(1);
         var value = results.Results.First();
-        value.EnumValue.Should().Be(TestEnum.SecondValue);
+        value.EnumValue.ShouldBe(TestEnum.SecondValue);
     }
         
     [Fact]
@@ -267,10 +331,10 @@ public class QueryableTests
 
         var results = _queryable.ToQueryResult(query);
 
-        results.Results.Should().ContainSingle();
-        results.Count.Should().Be(1);
+        results.Results.ShouldHaveSingleItem();
+        results.Count.ShouldBe(1);
         var value = results.Results.First();
-        value.OptionalEnumValue.Should().Be(TestEnum.SecondValue);
+        value.OptionalEnumValue.ShouldBe(TestEnum.SecondValue);
     }
 
     [Fact]
@@ -306,10 +370,10 @@ public class QueryableTests
 
         var results = _queryable.ToQueryResult(query);
 
-        results.Results.Should().ContainSingle();
-        results.Count.Should().Be(1);
+        results.Results.ShouldHaveSingleItem();
+        results.Count.ShouldBe(1);
         var value = results.Results.First();
-        value.OptionalEnumValue.Should().Be(TestEnum.SecondValue);
+        value.OptionalEnumValue.ShouldBe(TestEnum.SecondValue);
     }
 
     [Fact]
@@ -345,10 +409,10 @@ public class QueryableTests
 
         var results = _queryable.ToQueryResult(query);
 
-        results.Results.Should().ContainSingle();
-        results.Count.Should().Be(1);
+        results.Results.ShouldHaveSingleItem();
+        results.Count.ShouldBe(1);
         var value = results.Results.First();
-        value.OptionalEnumValue.Should().BeNull();
+        value.OptionalEnumValue.ShouldBeNull();
     }
 
     [Fact]
@@ -383,10 +447,10 @@ public class QueryableTests
 
         var results = _queryable.ToQueryResult(query);
 
-        results.Results.Should().ContainSingle();
-        results.Count.Should().Be(1);
+        results.Results.ShouldHaveSingleItem();
+        results.Count.ShouldBe(1);
         var value = results.Results.First();
-        value.EnumValue.Should().Be(TestEnum.SecondValue);
+        value.EnumValue.ShouldBe(TestEnum.SecondValue);
     }
         
     [Fact]
@@ -426,11 +490,11 @@ public class QueryableTests
 
         var results = _queryable.ToQueryResult(query);
 
-        results.Results.Should().HaveCount(2);
-        results.Count.Should().Be(2);
+        results.Results.Count().ShouldBe(2);
+        results.Count.ShouldBe(2);
         
-        results.Results.First().OptionalEnumValue.Should().Be(TestEnum.ThirdValue);
-        results.Results.Last().OptionalEnumValue.Should().Be(TestEnum.SecondValue);
+        results.Results.First().OptionalEnumValue.ShouldBe(TestEnum.ThirdValue);
+        results.Results.Last().OptionalEnumValue.ShouldBe(TestEnum.SecondValue);
     }
 
     [Fact]
@@ -470,11 +534,11 @@ public class QueryableTests
 
         var results = _queryable.ToQueryResult(query);
 
-        results.Results.Should().HaveCount(2);
-        results.Count.Should().Be(2);
+        results.Results.Count().ShouldBe(2);
+        results.Count.ShouldBe(2);
         
-        results.Results.First().OptionalEnumValue.Should().Be(TestEnum.ThirdValue);
-        results.Results.Last().OptionalEnumValue.Should().Be(TestEnum.SecondValue);
+        results.Results.First().OptionalEnumValue.ShouldBe(TestEnum.ThirdValue);
+        results.Results.Last().OptionalEnumValue.ShouldBe(TestEnum.SecondValue);
     }
 
     [Fact]
@@ -510,10 +574,10 @@ public class QueryableTests
 
         var results = _queryable.ToQueryResult(query);
 
-        results.Results.Should().ContainSingle();
-        results.Count.Should().Be(1);
+        results.Results.ShouldHaveSingleItem();
+        results.Count.ShouldBe(1);
         var value = results.Results.First();
-        value.EnumValue.Should().Be(TestEnum.ThirdValue);
+        value.EnumValue.ShouldBe(TestEnum.ThirdValue);
     }
 
     [Fact]
@@ -544,10 +608,10 @@ public class QueryableTests
 
         var results = _queryable.ToQueryResult(query);
 
-        results.Results.Should().ContainSingle();
-        results.Count.Should().Be(1);
+        results.Results.ShouldHaveSingleItem();
+        results.Count.ShouldBe(1);
         var value = results.Results.First();
-        value.Id.Should().Be(3);
+        value.Id.ShouldBe(3);
     }
 
     [Fact]
@@ -577,10 +641,10 @@ public class QueryableTests
 
         var results = _queryable.ToQueryResult(query);
 
-        results.Results.Should().ContainSingle();
-        results.Count.Should().Be(1);
+        results.Results.ShouldHaveSingleItem();
+        results.Count.ShouldBe(1);
         var value = results.Results.First();
-        value.Id.Should().Be(3);
+        value.Id.ShouldBe(3);
     }
 
     [Fact]
@@ -610,10 +674,10 @@ public class QueryableTests
 
         var results = _queryable.ToQueryResult(query);
 
-        results.Results.Should().ContainSingle();
-        results.Count.Should().Be(1);
+        results.Results.ShouldHaveSingleItem();
+        results.Count.ShouldBe(1);
         var value = results.Results.First();
-        value.Id.Should().Be(3);
+        value.Id.ShouldBe(3);
     }
 
     [Fact]
@@ -643,10 +707,10 @@ public class QueryableTests
 
         var results = _queryable.ToQueryResult(query);
 
-        results.Results.Should().ContainSingle();
-        results.Count.Should().Be(1);
+        results.Results.ShouldHaveSingleItem();
+        results.Count.ShouldBe(1);
         var value = results.Results.First();
-        value.Id.Should().Be(3);
+        value.Id.ShouldBe(3);
     }
 
     [Fact]
@@ -677,10 +741,10 @@ public class QueryableTests
 
         var results = _queryable.ToQueryResult(query);
 
-        results.Results.Should().ContainSingle();
-        results.Count.Should().Be(1);
+        results.Results.ShouldHaveSingleItem();
+        results.Count.ShouldBe(1);
         var value = results.Results.First();
-        value.Id.Should().Be(3);
+        value.Id.ShouldBe(3);
     }
         
     [Theory]
@@ -710,8 +774,8 @@ public class QueryableTests
 
         var results = _queryable.ToQueryResult(query);
 
-        results.Count.Should().Be(3);
-        results.Results.First().OptionalDateTime.Should().Be(expectedDateTime);
+        results.Count.ShouldBe(3);
+        results.Results.First().OptionalDateTime.ShouldBe(expectedDateTime);
     }
 
     [Fact]
@@ -741,10 +805,10 @@ public class QueryableTests
 
         var results = _queryable.ToQueryResult(query);
 
-        results.Results.Should().ContainSingle();
-        results.Count.Should().Be(1);
+        results.Results.ShouldHaveSingleItem();
+        results.Count.ShouldBe(1);
         var value = results.Results.First();
-        value.Id.Should().Be(3);
+        value.Id.ShouldBe(3);
     }
 
     [Fact]
@@ -767,9 +831,9 @@ public class QueryableTests
 
         var results = _queryable.ToQueryResult(query);
 
-        results.Results.Should().HaveCount(3);
-        results.Count.Should().Be(3);
-        results.Results.Should().BeInAscendingOrder(o => o.Id);
+        results.Results.Count().ShouldBe(3);
+        results.Count.ShouldBe(3);
+        results.Results.Select(o => o.Id).ShouldBeInOrder(SortDirection.Ascending);
     }
 
     [Fact]
@@ -800,9 +864,9 @@ public class QueryableTests
 
         var results = _queryable.ToQueryResult(query);
 
-        results.Results.Should().HaveCount(3);
-        results.Count.Should().Be(3);
-        results.Results.Should().BeInAscendingOrder(o => o.NestedModel.Id);
+        results.Results.Count().ShouldBe(3);
+        results.Count.ShouldBe(3);
+        results.Results.Select(o => o.NestedModel.Id).ShouldBeInOrder(SortDirection.Ascending);
     }
 
     public class TestModel

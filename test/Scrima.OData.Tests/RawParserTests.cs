@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using Shouldly;
 using Xunit;
 
 namespace Scrima.OData.Tests;
@@ -12,14 +12,14 @@ public class RawParserTests
     {
         var rawQueryParsed = ODataRawQueryOptions.ParseRawQuery(rawQueryString);
 
-        rawQueryParsed.Should().NotBeNull();
-        rawQueryParsed.Count.Should().Be("true");
-        rawQueryParsed.Filter.Should().Be("name eq 'Jon'");
-        rawQueryParsed.Search.Should().Be("myvalue");
-        rawQueryParsed.OrderBy.Should().Be("name asc");
-        rawQueryParsed.Top.Should().Be("10");
-        rawQueryParsed.Skip.Should().Be("5");
-        rawQueryParsed.SkipToken.Should().Be("mytoken");
+        rawQueryParsed.ShouldNotBeNull();
+        rawQueryParsed.Count.ShouldBe("true");
+        rawQueryParsed.Filter.ShouldBe("name eq 'Jon'");
+        rawQueryParsed.Search.ShouldBe("myvalue");
+        rawQueryParsed.OrderBy.ShouldBe("name asc");
+        rawQueryParsed.Top.ShouldBe("10");
+        rawQueryParsed.Skip.ShouldBe("5");
+        rawQueryParsed.SkipToken.ShouldBe("mytoken");
     }
         
     [Theory]
@@ -29,14 +29,14 @@ public class RawParserTests
     {
         var rawQueryParsed = ODataRawQueryOptions.ParseRawQuery(rawQueryString);
 
-        rawQueryParsed.Should().NotBeNull();
-        rawQueryParsed.Filter.Should().Be("name eq 'Jon'");
-        rawQueryParsed.Count.Should().BeNull();
-        rawQueryParsed.Search.Should().BeNull();
-        rawQueryParsed.OrderBy.Should().BeNull();
-        rawQueryParsed.Top.Should().BeNull();
-        rawQueryParsed.Skip.Should().BeNull();
-        rawQueryParsed.SkipToken.Should().BeNull();
+        rawQueryParsed.ShouldNotBeNull();
+        rawQueryParsed.Filter.ShouldBe("name eq 'Jon'");
+        rawQueryParsed.Count.ShouldBeNull();
+        rawQueryParsed.Search.ShouldBeNull();
+        rawQueryParsed.OrderBy.ShouldBeNull();
+        rawQueryParsed.Top.ShouldBeNull();
+        rawQueryParsed.Skip.ShouldBeNull();
+        rawQueryParsed.SkipToken.ShouldBeNull();
     }
         
     [Theory]
@@ -48,13 +48,13 @@ public class RawParserTests
     {
         var rawQueryParsed = ODataRawQueryOptions.ParseRawQuery(rawQueryString);
 
-        rawQueryParsed.Should().NotBeNull();
-        rawQueryParsed.Filter.Should().Be("name eq '/Jon'");
-        rawQueryParsed.Count.Should().BeNull();
-        rawQueryParsed.Search.Should().BeNull();
-        rawQueryParsed.OrderBy.Should().BeNull();
-        rawQueryParsed.Top.Should().BeNull();
-        rawQueryParsed.Skip.Should().BeNull();
-        rawQueryParsed.SkipToken.Should().BeNull();
+        rawQueryParsed.ShouldNotBeNull();
+        rawQueryParsed.Filter.ShouldBe("name eq '/Jon'");
+        rawQueryParsed.Count.ShouldBeNull();
+        rawQueryParsed.Search.ShouldBeNull();
+        rawQueryParsed.OrderBy.ShouldBeNull();
+        rawQueryParsed.Top.ShouldBeNull();
+        rawQueryParsed.Skip.ShouldBeNull();
+        rawQueryParsed.SkipToken.ShouldBeNull();
     }
 }
