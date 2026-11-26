@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>3.0.1</Version>
+    <Version>4.0.0</Version>
     <OpenApiGenerateDocuments>false</OpenApiGenerateDocuments>
     <Title>Scrima.NET OData Swagger schema for Swashbuckle</Title>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="11.0.1" />
   </ItemGroup>
 
   <ItemGroup>

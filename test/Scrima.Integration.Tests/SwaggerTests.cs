@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Microsoft.OpenApi;
 using Scrima.Integration.Tests.Initializers;
+using Shouldly;
 using Xunit;
 
 namespace Scrima.Integration.Tests;
@@ -17,16 +17,16 @@ public class SwaggerTests : IntegrationTestBase<InMemoryServicesInit>
         using var server = SetupSample();
         using var client = server.CreateClient();
 
-        using var response = await client.GetAsync("/swagger/odata/swagger.json");
-        var schemaText = await response.Content.ReadAsStringAsync();
+        using var response = await client.GetAsync("/swagger/odata/swagger.json", TestContext.Current.CancellationToken);
+        var schemaText = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        schemaText.Should().NotBeNull();
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        schemaText.ShouldNotBeNull();
 
         var (document, diagnostic) = OpenApiDocument.Parse(schemaText, OpenApiConstants.Json);
 
-        document.Should().NotBeNull();
-        diagnostic.Errors.Should().BeEmpty();
+        document.ShouldNotBeNull();
+        diagnostic.Errors.ShouldBeEmpty();
     }
         
     [Fact]
@@ -35,20 +35,20 @@ public class SwaggerTests : IntegrationTestBase<InMemoryServicesInit>
         using var server = SetupSample();
         using var client = server.CreateClient();
 
-        using var response = await client.GetAsync("/swagger/odata/swagger.json");
-        var schemaText = await response.Content.ReadAsStringAsync();
+        using var response = await client.GetAsync("/swagger/odata/swagger.json", TestContext.Current.CancellationToken);
+        var schemaText = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
         var (document, diagnostic) = OpenApiDocument.Parse(schemaText, OpenApiConstants.Json);
 
         var (_, operation) = document.Paths["/Blogs"].Operations.First();
 
-        operation.Parameters.Should().HaveCount(6);
-        operation.Parameters.Should().Contain(p => p.Name == "$filter");
-        operation.Parameters.Should().Contain(p => p.Name == "$count");
-        operation.Parameters.Should().Contain(p => p.Name == "$search");
-        operation.Parameters.Should().Contain(p => p.Name == "$skip");
-        operation.Parameters.Should().Contain(p => p.Name == "$top");
-        operation.Parameters.Should().Contain(p => p.Name == "$orderby");
+        operation.Parameters.Count.ShouldBe(6);
+        operation.Parameters.ShouldContain(p => p.Name == "$filter");
+        operation.Parameters.ShouldContain(p => p.Name == "$count");
+        operation.Parameters.ShouldContain(p => p.Name == "$search");
+        operation.Parameters.ShouldContain(p => p.Name == "$skip");
+        operation.Parameters.ShouldContain(p => p.Name == "$top");
+        operation.Parameters.ShouldContain(p => p.Name == "$orderby");
     }
     
     [Fact]
@@ -57,21 +57,21 @@ public class SwaggerTests : IntegrationTestBase<InMemoryServicesInit>
         using var server = SetupSample();
         using var client = server.CreateClient();
 
-        using var response = await client.GetAsync("/swagger/odata/swagger.json");
-        var schemaText = await response.Content.ReadAsStringAsync();
+        using var response = await client.GetAsync("/swagger/odata/swagger.json", TestContext.Current.CancellationToken);
+        var schemaText = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
         var (document, diagnostic) = OpenApiDocument.Parse(schemaText, OpenApiConstants.Json);
 
         var (_, operation) = document.Paths["/BlogPosts"].Operations.First();
 
-        operation.Parameters.Should().HaveCount(7);
-        operation.Parameters.Should().Contain(p => p.Name == "$filter");
-        operation.Parameters.Should().Contain(p => p.Name == "$count");
-        operation.Parameters.Should().Contain(p => p.Name == "$search");
-        operation.Parameters.Should().Contain(p => p.Name == "$skip");
-        operation.Parameters.Should().Contain(p => p.Name == "$top");
-        operation.Parameters.Should().Contain(p => p.Name == "$orderby");
-        operation.Parameters.Should().Contain(p => p.Name == "$skiptoken");
+        operation.Parameters.Count.ShouldBe(7);
+        operation.Parameters.ShouldContain(p => p.Name == "$filter");
+        operation.Parameters.ShouldContain(p => p.Name == "$count");
+        operation.Parameters.ShouldContain(p => p.Name == "$search");
+        operation.Parameters.ShouldContain(p => p.Name == "$skip");
+        operation.Parameters.ShouldContain(p => p.Name == "$top");
+        operation.Parameters.ShouldContain(p => p.Name == "$orderby");
+        operation.Parameters.ShouldContain(p => p.Name == "$skiptoken");
     }
     
     [Fact]
@@ -80,11 +80,11 @@ public class SwaggerTests : IntegrationTestBase<InMemoryServicesInit>
         using var server = SetupSample();
         using var client = server.CreateClient();
 
-        using var response = await client.GetAsync("/swagger/odata/swagger.json");
-        var schemaText = await response.Content.ReadAsStringAsync();
+        using var response = await client.GetAsync("/swagger/odata/swagger.json", TestContext.Current.CancellationToken);
+        var schemaText = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
         var (document, diagnostic) = OpenApiDocument.Parse(schemaText, OpenApiConstants.Json);
 
-        document.Components.Schemas.Should().HaveCount(7);
+        document.Components.Schemas.Count.ShouldBe(7);
     }
 }

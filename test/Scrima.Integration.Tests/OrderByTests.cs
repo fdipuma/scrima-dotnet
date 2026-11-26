@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Scrima.Integration.Sample.Models;
 using Scrima.Integration.Tests.Initializers;
 using Scrima.Integration.Tests.Utility;
+using Shouldly;
 using Xunit;
 
 namespace Scrima.Integration.Tests;
@@ -25,9 +25,9 @@ public abstract class OrderByTests<TInit> : IntegrationTestBase<TInit> where TIn
         using var server = SetupSample(OrderByTestUsers);
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$orderby=firstname&$orderby=username");
+        var response = await client.GetQueryAsync<User>("/users?$orderby=firstname&$orderby=username", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().BeInAscendingOrder(r => r.Username);
+        response.Results.Select(r => r.Username).ShouldBeInOrder(SortDirection.Ascending);
     }
 
     [Fact]
@@ -36,9 +36,9 @@ public abstract class OrderByTests<TInit> : IntegrationTestBase<TInit> where TIn
         using var server = SetupSample(OrderByTestUsers);
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$orderby=username");
+        var response = await client.GetQueryAsync<User>("/users?$orderby=username", cancellationToken: TestContext.Current.CancellationToken);
             
-        response.Results.Should().BeInAscendingOrder(r => r.Username);
+        response.Results.Select(r => r.Username).ShouldBeInOrder(SortDirection.Ascending);
     }
 
     [Fact]
@@ -47,9 +47,9 @@ public abstract class OrderByTests<TInit> : IntegrationTestBase<TInit> where TIn
         using var server = SetupSample(OrderByTestUsers);
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<Blog>("/blogs?$orderby=owner/username desc");
+        var response = await client.GetQueryAsync<Blog>("/blogs?$orderby=owner/username desc", cancellationToken: TestContext.Current.CancellationToken);
             
-        response.Results.Should().BeInDescendingOrder(r => r.Name);
+        response.Results.Select(r => r.Name).ShouldBeInOrder(SortDirection.Descending);
     }
 
     [Fact]
@@ -58,9 +58,9 @@ public abstract class OrderByTests<TInit> : IntegrationTestBase<TInit> where TIn
         using var server = SetupSample(OrderByTestUsers);
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$orderby=username asc");
+        var response = await client.GetQueryAsync<User>("/users?$orderby=username asc", cancellationToken: TestContext.Current.CancellationToken);
             
-        response.Results.Should().BeInAscendingOrder(r => r.Username);
+        response.Results.Select(r => r.Username).ShouldBeInOrder(SortDirection.Ascending);
     }
 
     [Fact]
@@ -69,9 +69,9 @@ public abstract class OrderByTests<TInit> : IntegrationTestBase<TInit> where TIn
         using var server = SetupSample(OrderByTestUsers);
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$orderby=username desc");
+        var response = await client.GetQueryAsync<User>("/users?$orderby=username desc", cancellationToken: TestContext.Current.CancellationToken);
             
-        response.Results.Should().BeInDescendingOrder(r => r.Username);
+        response.Results.Select(r => r.Username).ShouldBeInOrder(SortDirection.Descending);
     }
 
     [Fact]
@@ -81,9 +81,9 @@ public abstract class OrderByTests<TInit> : IntegrationTestBase<TInit> where TIn
         using var client = server.CreateClient();
         var expectedUsernameOrder = new[] {"B", "D", "A", "C"};
 
-        var response = await client.GetQueryAsync<User>("/users?$orderby=firstName, username");
+        var response = await client.GetQueryAsync<User>("/users?$orderby=firstName, username", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Select(o => o.Username).Should().ContainInOrder(expectedUsernameOrder);
+        response.Results.Select(o => o.Username).ShouldBe(expectedUsernameOrder);
     }
 
     [Fact]
@@ -93,9 +93,9 @@ public abstract class OrderByTests<TInit> : IntegrationTestBase<TInit> where TIn
         using var client = server.CreateClient();
         var expectedUsernameOrder = new[] {"B", "D", "A", "C"};
 
-        var response = await client.GetQueryAsync<User>("/users?$orderby=firstName asc, username asc");
+        var response = await client.GetQueryAsync<User>("/users?$orderby=firstName asc, username asc", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Select(o => o.Username).Should().ContainInOrder(expectedUsernameOrder);
+        response.Results.Select(o => o.Username).ShouldBe(expectedUsernameOrder);
     }
 
     [Fact]
@@ -105,9 +105,9 @@ public abstract class OrderByTests<TInit> : IntegrationTestBase<TInit> where TIn
         using var client = server.CreateClient();
         var expectedUsernameOrder = new[] {"C", "A", "D", "B"};
 
-        var response = await client.GetQueryAsync<User>("/users?$orderby=firstName desc, username desc");
+        var response = await client.GetQueryAsync<User>("/users?$orderby=firstName desc, username desc", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Select(o => o.Username).Should().ContainInOrder(expectedUsernameOrder);
+        response.Results.Select(o => o.Username).ShouldBe(expectedUsernameOrder);
     }
 
     [Fact]
@@ -117,9 +117,9 @@ public abstract class OrderByTests<TInit> : IntegrationTestBase<TInit> where TIn
         using var client = server.CreateClient();
         var expectedUsernameOrder = new[] {"D", "B", "C", "A"};
             
-        var response = await client.GetQueryAsync<User>("/users?$orderby=firstName asc, username desc");
+        var response = await client.GetQueryAsync<User>("/users?$orderby=firstName asc, username desc", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Select(o => o.Username).Should().ContainInOrder(expectedUsernameOrder);
+        response.Results.Select(o => o.Username).ShouldBe(expectedUsernameOrder);
     }
 }
 

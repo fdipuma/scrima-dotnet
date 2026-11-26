@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Scrima.Integration.Sample.Models;
 using Scrima.Integration.Tests.Initializers;
 using Scrima.Integration.Tests.Utility;
+using Shouldly;
 using Xunit;
 
 namespace Scrima.Integration.Tests;
@@ -19,9 +19,9 @@ public abstract class DateFilterTests<TInit> : IntegrationTestBase<TInit> where 
         using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$filter=year(createdAt) eq 2020");
+        var response = await client.GetQueryAsync<User>("/users?$filter=year(createdAt) eq 2020", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().BeEmpty();
+        response.Results.ShouldBeEmpty();
     }
 
     [Fact]
@@ -35,9 +35,9 @@ public abstract class DateFilterTests<TInit> : IntegrationTestBase<TInit> where 
 
         minDate = Uri.EscapeDataString(minDate);
         
-        var response = await client.GetQueryAsync<User>($"/users?$filter=createdAt gt {minDate}");
+        var response = await client.GetQueryAsync<User>($"/users?$filter=createdAt gt {minDate}", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().HaveCount(5);
+        response.Results.Count.ShouldBe(5);
     }
 
     [Fact]
@@ -47,9 +47,9 @@ public abstract class DateFilterTests<TInit> : IntegrationTestBase<TInit> where 
         using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>($"/users?$filter=createdAt gt 2021-01-05");
+        var response = await client.GetQueryAsync<User>($"/users?$filter=createdAt gt 2021-01-05", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().HaveCount(6);
+        response.Results.Count.ShouldBe(6);
     }
 
     [Fact]
@@ -59,9 +59,9 @@ public abstract class DateFilterTests<TInit> : IntegrationTestBase<TInit> where 
         using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
         
-        var response = await client.GetQueryAsync<User>($"/users?$filter=registrationDate gt 2021-01-05");
+        var response = await client.GetQueryAsync<User>($"/users?$filter=registrationDate gt 2021-01-05", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().HaveCount(5);
+        response.Results.Count.ShouldBe(5);
     }
 
     [Fact(Skip = "EF Core support for DateTimeOffset and DateOnly comparison is not complete")]
@@ -71,9 +71,9 @@ public abstract class DateFilterTests<TInit> : IntegrationTestBase<TInit> where 
         using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
         
-        var response = await client.GetQueryAsync<User>($"/users?$filter=registrationDate gt createdAt");
+        var response = await client.GetQueryAsync<User>($"/users?$filter=registrationDate gt createdAt", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().HaveCount(0);
+        response.Results.Count.ShouldBe(0);
     }
 
     protected static IEnumerable<User> CreateUsers(int testUserCount) =>

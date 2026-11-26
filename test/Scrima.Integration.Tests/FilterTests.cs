@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Scrima.Integration.Sample.Models;
 using Scrima.Integration.Tests.Initializers;
 using Scrima.Integration.Tests.Utility;
+using Shouldly;
 using Xunit;
 
 namespace Scrima.Integration.Tests;
@@ -19,9 +19,9 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$filter=true&$filter=false");
+        var response = await client.GetQueryAsync<User>("/users?$filter=true&$filter=false", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().BeEmpty();
+        response.Results.ShouldBeEmpty();
     }
 
     [Fact]
@@ -31,9 +31,9 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$filter=true");
+        var response = await client.GetQueryAsync<User>("/users?$filter=true", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().HaveCount(TestUserCount);
+        response.Results.Count.ShouldBe(TestUserCount);
     }
 
     [Fact]
@@ -43,9 +43,9 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$filter=false");
+        var response = await client.GetQueryAsync<User>("/users?$filter=false", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().BeEmpty();
+        response.Results.ShouldBeEmpty();
     }
 
     [Fact]
@@ -55,10 +55,10 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
         using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$filter=username eq 'user4'");
+        var response = await client.GetQueryAsync<User>("/users?$filter=username eq 'user4'", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().ContainSingle();
-        response.Results[0].Username.Should().Be("user4");
+        response.Results.ShouldHaveSingleItem();
+        response.Results[0].Username.ShouldBe("user4");
     }
 
     [Fact]
@@ -68,10 +68,10 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
         using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
 
-        var response = await client.GetStreamAsync<User>("/users/stream?$filter=username eq 'user4'");
+        var response = await client.GetStreamAsync<User>("/users/stream?$filter=username eq 'user4'", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Should().ContainSingle();
-        response[0].Username.Should().Be("user4");
+        response.ShouldHaveSingleItem();
+        response[0].Username.ShouldBe("user4");
     }
 
     [Fact]
@@ -81,10 +81,10 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
         using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$filter=lastname eq 'Smith4'");
+        var response = await client.GetQueryAsync<User>("/users?$filter=lastname eq 'Smith4'", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().ContainSingle();
-        response.Results[0].Username.Should().Be("user4");
+        response.Results.ShouldHaveSingleItem();
+        response.Results[0].Username.ShouldBe("user4");
     }
 
     [Fact]
@@ -94,9 +94,9 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
         using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$filter=not (username eq 'user4')");
+        var response = await client.GetQueryAsync<User>("/users?$filter=not (username eq 'user4')", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().HaveCount(TestUserCount - 1);
+        response.Results.Count.ShouldBe(TestUserCount - 1);
     }
 
     [Fact]
@@ -106,10 +106,10 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
         using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$filter=username eq 'user4' and lastname eq 'Smith4'");
+        var response = await client.GetQueryAsync<User>("/users?$filter=username eq 'user4' and lastname eq 'Smith4'", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().ContainSingle();
-        response.Results[0].Username.Should().Be("user4");
+        response.Results.ShouldHaveSingleItem();
+        response.Results[0].Username.ShouldBe("user4");
     }
 
     [Fact]
@@ -119,10 +119,10 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
         using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$filter=contains(username, '4')");
+        var response = await client.GetQueryAsync<User>("/users?$filter=contains(username, '4')", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().ContainSingle();
-        response.Results[0].Username.Should().Be("user4");
+        response.Results.ShouldHaveSingleItem();
+        response.Results[0].Username.ShouldBe("user4");
     }
 
     [Fact]
@@ -132,10 +132,10 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
         using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?%24filter=contains(domainid%2C%27%252F4%27)");
+        var response = await client.GetQueryAsync<User>("/users?%24filter=contains(domainid%2C%27%252F4%27)", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().ContainSingle();
-        response.Results[0].Username.Should().Be("user4");
+        response.Results.ShouldHaveSingleItem();
+        response.Results[0].Username.ShouldBe("user4");
     }
 
     [Fact]
@@ -145,11 +145,11 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
         using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$filter=username in ('user4', 'user5')");
+        var response = await client.GetQueryAsync<User>("/users?$filter=username in ('user4', 'user5')", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().HaveCount(2);
-        response.Results[0].Username.Should().Be("user4");
-        response.Results[1].Username.Should().Be("user5");
+        response.Results.Count.ShouldBe(2);
+        response.Results[0].Username.ShouldBe("user4");
+        response.Results[1].Username.ShouldBe("user5");
     }
 
     [Fact]
@@ -166,12 +166,12 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
         using var server = SetupSample(users);
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$filter=type in ('admin', 'superadmin')");
+        var response = await client.GetQueryAsync<User>("/users?$filter=type in ('admin', 'superadmin')", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().HaveCount(3);
-        response.Results[0].Username.Should().Be("user1");
-        response.Results[1].Username.Should().Be("user4");
-        response.Results[2].Username.Should().Be("user6");
+        response.Results.Count.ShouldBe(3);
+        response.Results[0].Username.ShouldBe("user1");
+        response.Results[1].Username.ShouldBe("user4");
+        response.Results[2].Username.ShouldBe("user6");
     }
 
     [Fact]
@@ -188,12 +188,12 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
         using var server = SetupSample(users);
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$filter=type in (1, 2)");
+        var response = await client.GetQueryAsync<User>("/users?$filter=type in (1, 2)", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().HaveCount(3);
-        response.Results[0].Username.Should().Be("user1");
-        response.Results[1].Username.Should().Be("user4");
-        response.Results[2].Username.Should().Be("user6");
+        response.Results.Count.ShouldBe(3);
+        response.Results[0].Username.ShouldBe("user1");
+        response.Results[1].Username.ShouldBe("user4");
+        response.Results[2].Username.ShouldBe("user6");
     }
 
     [Fact]
@@ -210,12 +210,12 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
         using var server = SetupSample(users);
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$filter=secondarytype in ('admin', 'superadmin')");
+        var response = await client.GetQueryAsync<User>("/users?$filter=secondarytype in ('admin', 'superadmin')", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().HaveCount(3);
-        response.Results[0].Username.Should().Be("user1");
-        response.Results[1].Username.Should().Be("user4");
-        response.Results[2].Username.Should().Be("user6");
+        response.Results.Count.ShouldBe(3);
+        response.Results[0].Username.ShouldBe("user1");
+        response.Results[1].Username.ShouldBe("user4");
+        response.Results[2].Username.ShouldBe("user6");
     }
 
     [Fact]
@@ -232,12 +232,12 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
         using var server = SetupSample(users);
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$filter=secondarytype in (1, 2)");
+        var response = await client.GetQueryAsync<User>("/users?$filter=secondarytype in (1, 2)", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().HaveCount(3);
-        response.Results[0].Username.Should().Be("user1");
-        response.Results[1].Username.Should().Be("user4");
-        response.Results[2].Username.Should().Be("user6");
+        response.Results.Count.ShouldBe(3);
+        response.Results[0].Username.ShouldBe("user1");
+        response.Results[1].Username.ShouldBe("user4");
+        response.Results[2].Username.ShouldBe("user6");
     }
 
     [Fact]
@@ -247,11 +247,11 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
         using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$filter=id gt 2 and id lt 5");
+        var response = await client.GetQueryAsync<User>("/users?$filter=id gt 2 and id lt 5", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().HaveCount(2);
-        response.Results[0].Id.Should().Be(3);
-        response.Results[1].Id.Should().Be(4);
+        response.Results.Count.ShouldBe(2);
+        response.Results[0].Id.ShouldBe(3);
+        response.Results[1].Id.ShouldBe(4);
     }
         
     [Fact]
@@ -261,9 +261,9 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
         using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$filter=length(blogs) gt 0 ");
+        var response = await client.GetQueryAsync<User>("/users?$filter=length(blogs) gt 0 ", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().HaveCount(TestUserCount);
+        response.Results.Count.ShouldBe(TestUserCount);
     }
 
     [Fact]
@@ -273,9 +273,9 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
         using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$filter=length(blogs) eq 0");
+        var response = await client.GetQueryAsync<User>("/users?$filter=length(blogs) eq 0", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().BeEmpty();
+        response.Results.ShouldBeEmpty();
     }
 
     [Fact]
@@ -285,9 +285,9 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
         using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<BlogPost>("/blogposts?$filter=blog/owner/id eq 4");
+        var response = await client.GetQueryAsync<BlogPost>("/blogposts?$filter=blog/owner/id eq 4", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().HaveCount(2);
+        response.Results.Count.ShouldBe(2);
     }
 
     [Theory]
@@ -301,9 +301,9 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
         using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>($"/users?$filter=engagement ge {filterValue}");
+        var response = await client.GetQueryAsync<User>($"/users?$filter=engagement ge {filterValue}", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().HaveCount(5);
+        response.Results.Count.ShouldBe(5);
     }
 
     [Fact]
@@ -313,9 +313,9 @@ public abstract class FilterTests<TInit> : IntegrationTestBase<TInit> where TIni
         using var server = SetupSample(CreateUsers(TestUserCount));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$filter=PayedAmout eq 25.30");
+        var response = await client.GetQueryAsync<User>("/users?$filter=PayedAmout eq 25.30", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().HaveCount(5);
+        response.Results.Count.ShouldBe(5);
     }
 
     private static IEnumerable<User> CreateUsers(int testUserCount) =>

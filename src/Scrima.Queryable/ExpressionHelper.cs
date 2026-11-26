@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -291,8 +292,12 @@ internal static class ExpressionHelper
 
         if (toPromotePrimiveType == typeof(float))
         {
-            if (otherPrimitiveType == typeof(double) ||
-                otherPrimitiveType == typeof(decimal))
+            if (otherPrimitiveType == typeof(decimal))
+            {
+                return ConvertToDecimalExpression(toPromote, toPromoteIsNullable, otherNullableType);
+            }
+
+            if (otherPrimitiveType == typeof(double))
             {
                 return ConvertExpression(toPromote, toPromoteIsNullable, otherPrimitiveType, otherNullableType);
             }
@@ -302,7 +307,7 @@ internal static class ExpressionHelper
         {
             if (otherPrimitiveType == typeof(decimal))
             {
-                return ConvertExpression(toPromote, toPromoteIsNullable, otherPrimitiveType, otherNullableType);
+                return ConvertToDecimalExpression(toPromote, toPromoteIsNullable, otherNullableType);
             }
         }
             
@@ -315,6 +320,24 @@ internal static class ExpressionHelper
         }
 
         return toPromote;
+    }
+
+    private static Expression ConvertToDecimalExpression(Expression toPromote, bool expressionTypeIsNullable, Type otherNullableType)
+    {
+        // Since .NET 11 float/double to decimal conversions are correctly rounded from the exact binary value
+        // (e.g. 25.3d becomes 25.300000000000000710542735760m), so a literal would no longer match the decimal
+        // the user typed: constants are converted through their shortest round-trippable representation instead,
+        // as Microsoft.OData.Core does when coercing Edm.Double literals (ODataUriConversionUtils.CoerceNumericType).
+        // https://learn.microsoft.com/dotnet/core/compatibility/core-libraries/11/decimal-biginteger-floating-point-conversions
+        if (toPromote is ConstantExpression { Value: float or double } constant &&
+            decimal.TryParse(((IFormattable)constant.Value).ToString("R", CultureInfo.InvariantCulture),
+                NumberStyles.Float, CultureInfo.InvariantCulture, out var decimalValue))
+        {
+            var targetType = otherNullableType ?? (expressionTypeIsNullable ? typeof(decimal?) : typeof(decimal));
+            return Expression.Constant(decimalValue, targetType);
+        }
+
+        return ConvertExpression(toPromote, expressionTypeIsNullable, typeof(decimal), otherNullableType);
     }
 
     private static Expression ConvertExpression(Expression toPromote, bool expressionTypeIsNullable, Type otherType, Type otherNullableType)
@@ -384,6 +407,11 @@ internal static class ExpressionHelper
         if (targetType == TypeUtilities.StringType)
         {
             return Expression.Call(argument, Methods.ObjectToString);
+        }
+
+        if (targetType == typeof(decimal))
+        {
+            return ConvertToDecimalExpression(argument, false, null);
         }
 
         return Expression.Convert(argument, targetType);

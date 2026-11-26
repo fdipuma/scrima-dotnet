@@ -1,11 +1,11 @@
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Scrima.Integration.Sample.Controllers;
 using Scrima.Integration.Sample.Models;
 using Scrima.Integration.Tests.Initializers;
 using Scrima.Integration.Tests.Utility;
+using Shouldly;
 using Xunit;
 
 namespace Scrima.Integration.Tests;
@@ -19,10 +19,10 @@ public abstract class CountTests<TInit> : IntegrationTestBase<TInit> where TInit
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users");
+        var response = await client.GetQueryAsync<User>("/users", cancellationToken: TestContext.Current.CancellationToken);
             
-        response.Count.Should().BeNull();
-        response.Results.Should().HaveCount(TestUserCount);
+        response.Count.ShouldBeNull();
+        response.Results.Count.ShouldBe(TestUserCount);
     }
         
     [Fact]
@@ -32,9 +32,9 @@ public abstract class CountTests<TInit> : IntegrationTestBase<TInit> where TInit
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users/override");
+        var response = await client.GetQueryAsync<User>("/users/override", cancellationToken: TestContext.Current.CancellationToken);
             
-        response.Results.Should().HaveCount(UsersController.OverriddenDefaultTop);
+        response.Results.Count.ShouldBe(UsersController.OverriddenDefaultTop);
     }
         
     [Fact]
@@ -44,11 +44,11 @@ public abstract class CountTests<TInit> : IntegrationTestBase<TInit> where TInit
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users/override?$top=10000");
+        var response = await client.GetQueryAsync<User>("/users/override?$top=10000", cancellationToken: TestContext.Current.CancellationToken);
             
-        response.Results.Should().HaveCount(UsersController.OverriddenMaxTop);
+        response.Results.Count.ShouldBe(UsersController.OverriddenMaxTop);
             
-        response.Count.Should().NotBeNull();
+        response.Count.ShouldNotBeNull();
     }
         
     [Fact]
@@ -58,7 +58,7 @@ public abstract class CountTests<TInit> : IntegrationTestBase<TInit> where TInit
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users/override");
+        var response = await client.GetQueryAsync<User>("/users/override", cancellationToken: TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -68,10 +68,10 @@ public abstract class CountTests<TInit> : IntegrationTestBase<TInit> where TInit
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$count=false&$count=true");
+        var response = await client.GetQueryAsync<User>("/users?$count=false&$count=true", cancellationToken: TestContext.Current.CancellationToken);
             
-        response.Count.Should().Be(TestUserCount);
-        response.Results.Should().HaveCount(TestUserCount);
+        response.Count.ShouldBe(TestUserCount);
+        response.Results.Count.ShouldBe(TestUserCount);
     }
 
     [Fact]
@@ -81,10 +81,10 @@ public abstract class CountTests<TInit> : IntegrationTestBase<TInit> where TInit
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$count=false");
+        var response = await client.GetQueryAsync<User>("/users?$count=false", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Count.Should().BeNull();
-        response.Results.Should().HaveCount(TestUserCount);
+        response.Count.ShouldBeNull();
+        response.Results.Count.ShouldBe(TestUserCount);
     }
 
     [Fact]
@@ -94,8 +94,8 @@ public abstract class CountTests<TInit> : IntegrationTestBase<TInit> where TInit
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        using var response = await client.GetAsync("/users?$count=myvalue");
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        using var response = await client.GetAsync("/users?$count=myvalue", TestContext.Current.CancellationToken);
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -105,10 +105,10 @@ public abstract class CountTests<TInit> : IntegrationTestBase<TInit> where TInit
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$count=true");
+        var response = await client.GetQueryAsync<User>("/users?$count=true", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Count.Should().Be(TestUserCount);
-        response.Results.Should().HaveCount(TestUserCount);
+        response.Count.ShouldBe(TestUserCount);
+        response.Results.Count.ShouldBe(TestUserCount);
     }
 
     [Fact]
@@ -119,10 +119,10 @@ public abstract class CountTests<TInit> : IntegrationTestBase<TInit> where TInit
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>($"/users?$count=true&$skip=1&$top={SelectCount}");
+        var response = await client.GetQueryAsync<User>($"/users?$count=true&$skip=1&$top={SelectCount}", cancellationToken: TestContext.Current.CancellationToken);
             
-        response.Count.Should().Be(TestUserCount);
-        response.Results.Should().ContainSingle();
+        response.Count.ShouldBe(TestUserCount);
+        response.Results.ShouldHaveSingleItem();
     }
 
     [Fact]
@@ -133,10 +133,10 @@ public abstract class CountTests<TInit> : IntegrationTestBase<TInit> where TInit
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>($"/users?$count=true&$filter=Id le {FilterCount}");
+        var response = await client.GetQueryAsync<User>($"/users?$count=true&$filter=Id le {FilterCount}", cancellationToken: TestContext.Current.CancellationToken);
             
-        response.Count.Should().Be(FilterCount);
-        response.Results.Should().HaveCount(FilterCount);
+        response.Count.ShouldBe(FilterCount);
+        response.Results.Count.ShouldBe(FilterCount);
     }
 
     [Fact]
@@ -148,10 +148,10 @@ public abstract class CountTests<TInit> : IntegrationTestBase<TInit> where TInit
         using var server = SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User()));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>($"/users?$count=true&$skip=1&$top={SelectCount}&$filter=Id le {FilterCount}");
+        var response = await client.GetQueryAsync<User>($"/users?$count=true&$skip=1&$top={SelectCount}&$filter=Id le {FilterCount}", cancellationToken: TestContext.Current.CancellationToken);
             
-        response.Count.Should().Be(FilterCount);
-        response.Results.Should().ContainSingle();
+        response.Count.ShouldBe(FilterCount);
+        response.Results.ShouldHaveSingleItem();
     }
 }
 

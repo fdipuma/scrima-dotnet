@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -11,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
 using Scrima.Integration.Sample.Data;
 using Scrima.OData.Swashbuckle;
+using Shouldly;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Xunit;
 
@@ -53,11 +53,11 @@ public class EntityFieldsSwaggerTests
     {
         using var client = server.CreateClient();
         using var response = await client.GetAsync("/swagger/odata/swagger.json");
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var schemaText = await response.Content.ReadAsStringAsync();
         var (document, diagnostic) = OpenApiDocument.Parse(schemaText, OpenApiConstants.Json);
-        document.Should().NotBeNull();
-        diagnostic.Errors.Should().BeEmpty();
+        document.ShouldNotBeNull();
+        diagnostic.Errors.ShouldBeEmpty();
         return document;
     }
 
@@ -76,13 +76,13 @@ public class EntityFieldsSwaggerTests
         var filterParam = operation.Parameters.First(p => p.Name == "$filter");
         var orderByParam = operation.Parameters.First(p => p.Name == "$orderby");
 
-        filterParam.Description.Should().NotContain("Filterable properties");
-        orderByParam.Description.Should().NotContain("Orderable properties");
+        filterParam.Description.ShouldNotContain("Filterable properties", Case.Sensitive);
+        orderByParam.Description.ShouldNotContain("Orderable properties", Case.Sensitive);
 
         var extensions = operation.Extensions;
-        (extensions?.ContainsKey("x-odata-filterable-properties") ?? false).Should().BeFalse();
-        (extensions?.ContainsKey("x-odata-orderable-properties") ?? false).Should().BeFalse();
-        (extensions?.ContainsKey("x-odata-entity") ?? false).Should().BeFalse();
+        (extensions?.ContainsKey("x-odata-filterable-properties") ?? false).ShouldBeFalse();
+        (extensions?.ContainsKey("x-odata-orderable-properties") ?? false).ShouldBeFalse();
+        (extensions?.ContainsKey("x-odata-entity") ?? false).ShouldBeFalse();
     }
 
     [Fact]
@@ -97,21 +97,21 @@ public class EntityFieldsSwaggerTests
         var (_, operation) = document.Paths["/Blogs"].Operations.First();
 
         var filterParam = operation.Parameters.First(p => p.Name == "$filter");
-        filterParam.Description.Should().Contain("Filterable properties:");
-        filterParam.Description.Should().Contain("Id (integer)");
-        filterParam.Description.Should().Contain("Name (string)");
-        filterParam.Description.Should().Contain("Description (string)");
-        filterParam.Description.Should().Contain("OwnerId (integer)");
+        filterParam.Description.ShouldContain("Filterable properties:", Case.Sensitive);
+        filterParam.Description.ShouldContain("Id (integer)", Case.Sensitive);
+        filterParam.Description.ShouldContain("Name (string)", Case.Sensitive);
+        filterParam.Description.ShouldContain("Description (string)", Case.Sensitive);
+        filterParam.Description.ShouldContain("OwnerId (integer)", Case.Sensitive);
 
         var orderByParam = operation.Parameters.First(p => p.Name == "$orderby");
-        orderByParam.Description.Should().Contain("Orderable properties:");
-        orderByParam.Description.Should().Contain("Id (integer)");
-        orderByParam.Description.Should().Contain("Name (string)");
+        orderByParam.Description.ShouldContain("Orderable properties:", Case.Sensitive);
+        orderByParam.Description.ShouldContain("Id (integer)", Case.Sensitive);
+        orderByParam.Description.ShouldContain("Name (string)", Case.Sensitive);
 
-        operation.Extensions.Should().NotBeNull();
-        operation.Extensions.Should().ContainKey("x-odata-filterable-properties");
-        operation.Extensions.Should().ContainKey("x-odata-orderable-properties");
-        operation.Extensions.Should().ContainKey("x-odata-entity");
+        operation.Extensions.ShouldNotBeNull();
+        operation.Extensions.ShouldContainKey("x-odata-filterable-properties");
+        operation.Extensions.ShouldContainKey("x-odata-orderable-properties");
+        operation.Extensions.ShouldContainKey("x-odata-entity");
     }
 
     [Fact]
@@ -126,14 +126,14 @@ public class EntityFieldsSwaggerTests
         var (_, operation) = document.Paths["/Blogs"].Operations.First();
 
         var filterParam = operation.Parameters.First(p => p.Name == "$filter");
-        filterParam.Description.Should().Contain("Filterable properties:");
+        filterParam.Description.ShouldContain("Filterable properties:", Case.Sensitive);
 
         var orderByParam = operation.Parameters.First(p => p.Name == "$orderby");
-        orderByParam.Description.Should().NotContain("Orderable properties");
+        orderByParam.Description.ShouldNotContain("Orderable properties", Case.Sensitive);
 
-        operation.Extensions.Should().NotBeNull();
-        operation.Extensions.Should().ContainKey("x-odata-filterable-properties");
-        operation.Extensions.Keys.Should().NotContain("x-odata-orderable-properties");
+        operation.Extensions.ShouldNotBeNull();
+        operation.Extensions.ShouldContainKey("x-odata-filterable-properties");
+        operation.Extensions.Keys.ShouldNotContain("x-odata-orderable-properties");
     }
 
     [Fact]
@@ -149,11 +149,11 @@ public class EntityFieldsSwaggerTests
         var (_, operation) = document.Paths["/Blogs"].Operations.First();
 
         var filterParam = operation.Parameters.First(p => p.Name == "$filter");
-        filterParam.Description.Should().Contain("Filterable properties:");
+        filterParam.Description.ShouldContain("Filterable properties:", Case.Sensitive);
 
-        operation.Extensions.Should().NotBeNull();
-        operation.Extensions.Should().ContainKey("x-odata-filterable-properties");
-        operation.Extensions.Should().ContainKey("x-odata-orderable-properties");
-        operation.Extensions.Keys.Should().NotContain("x-odata-entity");
+        operation.Extensions.ShouldNotBeNull();
+        operation.Extensions.ShouldContainKey("x-odata-filterable-properties");
+        operation.Extensions.ShouldContainKey("x-odata-orderable-properties");
+        operation.Extensions.Keys.ShouldNotContain("x-odata-entity");
     }
 }

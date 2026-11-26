@@ -1,9 +1,9 @@
 using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Scrima.Integration.Sample.Models;
 using Scrima.Integration.Tests.Initializers;
 using Scrima.Integration.Tests.Utility;
+using Shouldly;
 using Xunit;
 
 namespace Scrima.Integration.Tests;
@@ -18,10 +18,10 @@ public abstract class SearchTests<TInit> : IntegrationTestBase<TInit> where TIni
             SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User {Username = $"user{i}"}));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$search=er2");
+        var response = await client.GetQueryAsync<User>("/users?$search=er2", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().HaveCount(1);
-        response.Results[0].Username.Should().Be("user2");
+        response.Results.Count.ShouldBe(1);
+        response.Results[0].Username.ShouldBe("user2");
     }
 
     [Fact]
@@ -32,10 +32,10 @@ public abstract class SearchTests<TInit> : IntegrationTestBase<TInit> where TIni
             SetupSample(Enumerable.Range(1, TestUserCount).Select(i => new User {Username = $"user{i}"}));
         using var client = server.CreateClient();
 
-        var response = await client.GetQueryAsync<User>("/users?$search=er3&$search=er2");
+        var response = await client.GetQueryAsync<User>("/users?$search=er3&$search=er2", cancellationToken: TestContext.Current.CancellationToken);
 
-        response.Results.Should().HaveCount(1);
-        response.Results[0].Username.Should().Be("user2");
+        response.Results.Count.ShouldBe(1);
+        response.Results[0].Username.ShouldBe("user2");
     }
 }
     
