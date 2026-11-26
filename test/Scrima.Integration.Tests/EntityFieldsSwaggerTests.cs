@@ -16,11 +16,13 @@ using Xunit;
 
 namespace Scrima.Integration.Tests;
 
-public class EntityFieldsSwaggerTests
+public class EntityFieldsSwaggerTests : IAsyncDisposable
 {
-    private static TestServer SetupWithEntityFields(Action<EntityFieldsOptions> configure)
+    private WebApplicationFactory<Sample.Program> _factory;
+
+    private TestServer SetupWithEntityFields(Action<EntityFieldsOptions> configure)
     {
-        var factory = new WebApplicationFactory<Sample.Program>()
+        _factory = new WebApplicationFactory<Sample.Program>()
             .WithWebHostBuilder(builder =>
             {
                 builder.UseEnvironment("Development");
@@ -46,7 +48,15 @@ public class EntityFieldsSwaggerTests
                 });
             });
 
-        return factory.Server;
+        return _factory.Server;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_factory is not null)
+        {
+            await _factory.DisposeAsync();
+        }
     }
 
     private static async Task<OpenApiDocument> GetSwaggerDocument(TestServer server)
