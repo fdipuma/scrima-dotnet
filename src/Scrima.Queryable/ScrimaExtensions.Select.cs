@@ -19,7 +19,7 @@ public static partial class ScrimaExtensions
     /// <param name="selectQueryOption">The select options to apply</param>
     /// <returns>The projected data source</returns>
     /// <exception cref="ArgumentNullException">source or select are null</exception>
-    /// <exception cref="QueryOptionsValidationException">A selected property cannot be set, or a type cannot be created</exception>
+    /// <exception cref="QueryOptionsValidationException">A selected property cannot be read or set, or a type cannot be created</exception>
     public static IQueryable<TSource> Select<TSource>(this IQueryable<TSource> source,
         SelectQueryOption selectQueryOption)
     {

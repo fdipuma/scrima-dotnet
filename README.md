@@ -80,7 +80,7 @@ public ActionResult GetAll(ODataQuery<MyModel> query)
 
 `$select` returns items of the same type where only the selected properties are populated; the other properties keep their default values. Nested properties are selected with a path (e.g. `$select=title,blog/name`) and `$select=*` selects all the properties.
 
-The queried type (and any type reached through a selected path) needs a public parameterless constructor and the selected properties must be settable; otherwise the request fails with a parse error (400 Bad Request). Items are always created with the queried type, so instances of derived types (for example with EF Core inheritance) are returned as the queried base type. To omit the properties that were not selected from JSON responses, ignore default values when serializing (selected properties holding a default value are omitted as well):
+The queried type (and any type reached through a selected path) needs a public parameterless constructor and the selected properties must be readable and settable; otherwise the request fails with a parse error (400 Bad Request). Items are always created with the queried type, so instances of derived types (for example with EF Core inheritance) are returned as the queried base type. To omit the properties that were not selected from JSON responses, ignore default values when serializing (selected properties holding a default value are omitted as well):
 
 ```csharp
 services.AddControllers()

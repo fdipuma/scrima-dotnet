@@ -103,6 +103,20 @@ public abstract class SelectTests<TInit> : IntegrationTestBase<TInit> where TIni
     }
 
     [Fact]
+    public async Task Should_IgnoreEmptySelect_When_SelectIsRepeated()
+    {
+        using var server = SetupSample(CreateUsers());
+        using var client = server.CreateClient();
+
+        var response = await client.GetQueryAsync<User>("/users?$select=username&$select=&$filter=username eq 'user1'",
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        var user = response.Results.ShouldHaveSingleItem();
+        user.Username.ShouldBe("user1");
+        user.LastName.ShouldBeNull();
+    }
+
+    [Fact]
     public async Task Should_ReturnBadRequest_When_SelectedPropertyIsUnknown()
     {
         using var server = SetupSample(CreateUsers());

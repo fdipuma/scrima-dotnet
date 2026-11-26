@@ -91,10 +91,10 @@ public class SelectTests
         var specialType = (EdmComplexType)new EdmTypeProvider().GetByClrType(typeof(SpecialPost));
         var posts = new[] { new SpecialPost { Id = 1, Title = "Special" } }.AsQueryable();
 
-        var post = posts.Select(SelectPaths(specialType, "title")).Single();
+        var post = posts.Select(SelectPaths(specialType, "id")).Single();
 
-        post.Title.ShouldBe("Special");
-        post.Id.ShouldBe(0);
+        post.Id.ShouldBe(1);
+        post.Title.ShouldBeNull();
     }
 
     [Fact]
@@ -132,7 +132,8 @@ public class SelectTests
 
     public class SpecialPost : Post
     {
-        public new string Title { get; set; }
+        // hidden with a different type, so reflection finds two Id properties
+        public new long Id { get; set; }
     }
 
     public record PostDto(string Title);

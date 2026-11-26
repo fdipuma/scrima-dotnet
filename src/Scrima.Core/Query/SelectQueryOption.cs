@@ -45,7 +45,7 @@ public sealed class SelectQueryOption
     /// </remarks>
     /// <param name="itemType">The type of the projected items</param>
     /// <returns>The projection, or <c>null</c> when all the properties are selected</returns>
-    /// <exception cref="QueryOptionsValidationException">A selected property cannot be set, or a type cannot be created</exception>
+    /// <exception cref="QueryOptionsValidationException">A selected property cannot be read or set, or a type cannot be created</exception>
     public LambdaExpression CreateProjection(Type itemType)
     {
         if (itemType == null) throw new ArgumentNullException(nameof(itemType));
@@ -83,7 +83,7 @@ public sealed class SelectQueryOption
     {
         var property = FindProperty(source.Type, propertyName);
 
-        if (property is not { CanWrite: true })
+        if (property is not { CanRead: true, CanWrite: true })
         {
             throw new QueryOptionsValidationException($"Property {propertyName} cannot be selected");
         }
@@ -115,14 +115,15 @@ public sealed class SelectQueryOption
 
     /// <summary>
     /// Finds the public instance property with the specified name, starting from the most derived type,
-    /// so that a property hidden with <c>new</c> resolves to the derived declaration.
+    /// so that a property hidden with <c>new</c> resolves to the derived declaration. Indexers are ignored.
     /// </summary>
     private static PropertyInfo FindProperty(Type type, string name)
     {
         for (var current = type; current != null; current = current.BaseType)
         {
             var property = current.GetProperty(name,
-                BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+                BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly,
+                binder: null, returnType: null, types: Type.EmptyTypes, modifiers: null);
 
             if (property != null) return property;
         }

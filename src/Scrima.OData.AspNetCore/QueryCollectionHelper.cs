@@ -15,10 +15,11 @@ internal static class QueryCollectionHelper
 
         StringValues value;
 
-        // an empty $select is ignored, as in ODataRawQueryOptions.ParseRawQuery
-        if (query.TryGetValue(ODataRawQueryOptions.SelectParamName, out value) && !string.IsNullOrEmpty(value.Last()))
+        // empty $select values are ignored, as in ODataRawQueryOptions.ParseRawQuery
+        if (query.TryGetValue(ODataRawQueryOptions.SelectParamName, out value)
+            && value.LastOrDefault(v => !string.IsNullOrEmpty(v)) is { } select)
         {
-            options.Select = value.Last();
+            options.Select = select;
         }
 
         if (query.TryGetValue(ODataRawQueryOptions.FilterParamName, out value))

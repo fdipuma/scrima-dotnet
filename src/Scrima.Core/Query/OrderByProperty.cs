@@ -42,6 +42,6 @@ public sealed class OrderByProperty
 
     public override string ToString()
     {
-        return $"{string.Join(".", Properties)}-{Direction}";
+        return $"{string.Join(PropertyPath.Separator, Properties)}-{Direction}";
     }
 }

@@ -55,6 +55,8 @@ public class QueryOptionsParserTests
 
     [Theory]
     [InlineData("$select=code")]
+    [InlineData("$select=secret")]
+    [InlineData("$select=item")]
     [InlineData("$select=contact/email")]
     public void Should_Throw_When_SelectionCannotBeProjected(string rawQuery)
     {
@@ -81,10 +83,12 @@ public class QueryOptionsParserTests
     {
         public string Name { get; set; }
         public string Code => Name;
+        public string Secret { set { } }
         public decimal Price { get; set; }
         public Money Cost { get; set; }
         public Supplier Supplier { get; set; }
         public Contact Contact { get; set; }
+        public string this[int index] { get => Name; set { } }
     }
 
     private class Supplier
