@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Scrima.Core;
+using Scrima.Core.Exceptions;
 using Scrima.Core.Model;
 using Scrima.Core.Query;
 using Scrima.OData.Parsers;
@@ -91,6 +92,18 @@ internal static class ODataQueryParseHelper
 
         var properties = items.Select(item => new SelectProperty(PropertyParseHelper.ParseNestedProperties(item, model)));
 
-        return new SelectQueryOption(properties);
+        var select = new SelectQueryOption(properties);
+
+        // build the projection now, so that an invalid selection is a parse error and not a failure when querying
+        try
+        {
+            select.CreateProjection(model.ClrType);
+        }
+        catch (QueryOptionsValidationException ex)
+        {
+            throw new ODataParseException(ex.Message);
+        }
+
+        return select;
     }
 }

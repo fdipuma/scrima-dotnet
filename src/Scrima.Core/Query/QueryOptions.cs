@@ -10,6 +10,23 @@ namespace Scrima.Core.Query;
 public class QueryOptions
 {
     /// <summary>
+    /// Initialises a new instance of the <see cref="QueryOptions" /> class, selecting all the properties.
+    /// </summary>
+    /// <param name="edmType"></param>
+    /// <param name="filter">Filter query option</param>
+    /// <param name="orderBy">Order by query option</param>
+    /// <param name="search">Search query option</param>
+    /// <param name="skip">Skip query option</param>
+    /// <param name="skipToken">Skip token query option</param>
+    /// <param name="top">Top query option</param>
+    /// <param name="showCount">Show count query option</param>
+    public QueryOptions(EdmComplexType edmType, FilterQueryOption filter, OrderByQueryOption orderBy,
+        string search, long? skip, string skipToken, long? top, bool showCount)
+        : this(edmType, filter, orderBy, search, skip, skipToken, top, showCount, SelectQueryOption.All)
+    {
+    }
+
+    /// <summary>
     /// Initialises a new instance of the <see cref="QueryOptions" /> class.
     /// </summary>
     /// <param name="edmType"></param>
@@ -20,9 +37,9 @@ public class QueryOptions
     /// <param name="skipToken">Skip token query option</param>
     /// <param name="top">Top query option</param>
     /// <param name="showCount">Show count query option</param>
-    /// <param name="select">Select query option, all the properties are selected when not specified</param>
+    /// <param name="select">Select query option, all the properties are selected when null</param>
     public QueryOptions(EdmComplexType edmType, FilterQueryOption filter, OrderByQueryOption orderBy,
-        string search, long? skip, string skipToken, long? top, bool showCount, SelectQueryOption select = null)
+        string search, long? skip, string skipToken, long? top, bool showCount, SelectQueryOption select)
     {
         EdmType = edmType ?? throw new ArgumentNullException(nameof(edmType));
         Filter = filter ?? throw new ArgumentNullException(nameof(filter));

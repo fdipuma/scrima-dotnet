@@ -44,18 +44,63 @@ public class QueryOptionsParserTests
         Should.Throw<ODataParseException>(() => Parse(rawQuery));
     }
 
+    [Theory]
+    [InlineData("$select=")]
+    [InlineData("$select=contact")]
+    [InlineData("$select=cost/amount")]
+    public void Should_NotThrow_When_SelectIsValid(string rawQuery)
+    {
+        Should.NotThrow(() => Parse(rawQuery));
+    }
+
+    [Theory]
+    [InlineData("$select=code")]
+    [InlineData("$select=contact/email")]
+    public void Should_Throw_When_SelectionCannotBeProjected(string rawQuery)
+    {
+        Should.Throw<ODataParseException>(() => Parse(rawQuery));
+    }
+
+    [Fact]
+    public void Should_Throw_When_ItemTypeHasNoParameterlessConstructor()
+    {
+        Should.Throw<ODataParseException>(() =>
+            _parser.ParseOptions(typeof(ProductDto), ODataRawQueryOptions.ParseRawQuery("$select=name")));
+    }
+
+    [Fact]
+    public void Should_FormatSelectWithPathSeparator()
+    {
+        Parse("$select=name,supplier/name").Select.ToString().ShouldBe("Select=Name,Supplier/Name");
+    }
+
     private QueryOptions Parse(string rawQuery) =>
         _parser.ParseOptions(typeof(Product), ODataRawQueryOptions.ParseRawQuery(rawQuery));
 
     private class Product
     {
         public string Name { get; set; }
+        public string Code => Name;
         public decimal Price { get; set; }
+        public Money Cost { get; set; }
         public Supplier Supplier { get; set; }
+        public Contact Contact { get; set; }
     }
 
     private class Supplier
     {
         public string Name { get; set; }
     }
+
+    private struct Money
+    {
+        public decimal Amount { get; set; }
+    }
+
+    private class Contact(string email)
+    {
+        public string Email { get; set; } = email;
+    }
+
+    private record ProductDto(string Name);
 }

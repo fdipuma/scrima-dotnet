@@ -32,5 +32,5 @@ public sealed class SelectProperty
     /// </summary>
     public IReadOnlyList<EdmProperty> Properties { get; }
 
-    public override string ToString() => string.Join(".", Properties);
+    public override string ToString() => string.Join("/", Properties);
 }

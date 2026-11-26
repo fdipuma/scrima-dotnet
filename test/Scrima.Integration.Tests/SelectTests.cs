@@ -89,6 +89,20 @@ public abstract class SelectTests<TInit> : IntegrationTestBase<TInit> where TIni
     }
 
     [Fact]
+    public async Task Should_ReturnAllProperties_When_SelectIsEmpty()
+    {
+        using var server = SetupSample(CreateUsers());
+        using var client = server.CreateClient();
+
+        var response = await client.GetQueryAsync<User>("/users?$select=&$filter=username eq 'user1'",
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        var user = response.Results.ShouldHaveSingleItem();
+        user.Username.ShouldBe("user1");
+        user.LastName.ShouldBe("Smith1");
+    }
+
+    [Fact]
     public async Task Should_ReturnBadRequest_When_SelectedPropertyIsUnknown()
     {
         using var server = SetupSample(CreateUsers());

@@ -74,13 +74,45 @@ public class SelectTests
         post.Id.ShouldBe(0);
     }
 
-    private static SelectQueryOption SelectPaths(params string[] paths) =>
-        new(paths.Select(path => new SelectProperty(ResolvePath(path))));
-
-    private static IEnumerable<EdmProperty> ResolvePath(string path)
+    [Fact]
+    public void Should_ProjectNestedProperties_When_PathGoesThroughStruct()
     {
-        var type = PostType;
+        var posts = new[] { new Post { Stats = new Stats { Views = 10, Likes = 3 } } }.AsQueryable();
 
+        var post = posts.Select(SelectPaths("stats/views")).Single();
+
+        post.Stats.Views.ShouldBe(10);
+        post.Stats.Likes.ShouldBe(0);
+    }
+
+    [Fact]
+    public void Should_SelectDerivedProperty_When_PropertyIsHidden()
+    {
+        var specialType = (EdmComplexType)new EdmTypeProvider().GetByClrType(typeof(SpecialPost));
+        var posts = new[] { new SpecialPost { Id = 1, Title = "Special" } }.AsQueryable();
+
+        var post = posts.Select(SelectPaths(specialType, "title")).Single();
+
+        post.Title.ShouldBe("Special");
+        post.Id.ShouldBe(0);
+    }
+
+    [Fact]
+    public void Should_Throw_When_TypeHasNoParameterlessConstructor()
+    {
+        var dtoType = (EdmComplexType)new EdmTypeProvider().GetByClrType(typeof(PostDto));
+        var posts = new[] { new PostDto("First") }.AsQueryable();
+
+        Should.Throw<QueryOptionsValidationException>(() => posts.Select(SelectPaths(dtoType, "title")));
+    }
+
+    private static SelectQueryOption SelectPaths(params string[] paths) => SelectPaths(PostType, paths);
+
+    private static SelectQueryOption SelectPaths(EdmComplexType rootType, params string[] paths) =>
+        new(paths.Select(path => new SelectProperty(ResolvePath(rootType, path))));
+
+    private static IEnumerable<EdmProperty> ResolvePath(EdmComplexType type, string path)
+    {
         foreach (var name in path.Split('/'))
         {
             var property = type.GetProperty(name);
@@ -95,6 +127,20 @@ public class SelectTests
         public string Title { get; set; }
         public int TitleLength => Title.Length;
         public Blog Blog { get; set; }
+        public Stats Stats { get; set; }
+    }
+
+    public class SpecialPost : Post
+    {
+        public new string Title { get; set; }
+    }
+
+    public record PostDto(string Title);
+
+    public struct Stats
+    {
+        public int Views { get; set; }
+        public int Likes { get; set; }
     }
 
     public class Blog
