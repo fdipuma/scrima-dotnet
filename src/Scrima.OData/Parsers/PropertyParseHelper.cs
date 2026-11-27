@@ -11,12 +11,11 @@ internal static class PropertyParseHelper
 
         foreach (var propertyName in tokenValue.Split('/'))
         {
-            if (edmComplexType is null)
+            if (edmComplexType is null || !edmComplexType.TryGetProperty(propertyName, out var currentProperty))
             {
                 throw new ODataParseException($"Property {propertyName} not found");
             }
 
-            var currentProperty = edmComplexType.GetProperty(propertyName);
             properties.Add(currentProperty);
             edmComplexType = currentProperty.PropertyType as EdmComplexType;
         }

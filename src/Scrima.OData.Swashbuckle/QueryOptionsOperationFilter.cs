@@ -59,6 +59,10 @@ internal class QueryOptionsOperationFilter(ScrimaSwaggerOptions options) : IOper
         UpdateParamInfo(operation, "$orderby", JsonSchemaType.String,
             "A comma separated list of properties to sort the result set using the OData 4.0 Syntax (http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#_Toc31358952)",
             itemTypeOptions.AllowOrderBy);
+
+        UpdateParamInfo(operation, "$select", JsonSchemaType.String,
+            "A comma separated list of properties to include in the result set, nested properties are separated by '/' (e.g. name,address/city)",
+            itemTypeOptions.AllowSelect);
         
         UpdateParamInfo(operation, "$skip", JsonSchemaType.Integer,
             "The number of items to skip for paging",

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -8,14 +10,17 @@ using Scrima.Integration.Tests.Initializers;
 
 namespace Scrima.Integration.Tests;
 
-public abstract class IntegrationTestBase<TInit> where TInit : ServicesInitBase, new()
+public abstract class IntegrationTestBase<TInit> : IAsyncDisposable where TInit : ServicesInitBase, new()
 {
-    protected static TestServer SetupSample(IEnumerable<User> testdata = null)
+    // Disposing the TestServer doesn't stop the host: the factory owns it and is disposed after each test
+    private CustomWebApplicationFactory<TInit, Sample.Program> _factory;
+
+    protected TestServer SetupSample(IEnumerable<User> testdata = null)
     {
         var initializer = new TInit();
 
-        var factory = new CustomWebApplicationFactory<TInit, Sample.Program>(initializer);
-        var server = factory.Server;
+        _factory = new CustomWebApplicationFactory<TInit, Sample.Program>(initializer);
+        var server = _factory.Server;
 
         if (testdata != null)
         {
@@ -36,5 +41,13 @@ public abstract class IntegrationTestBase<TInit> where TInit : ServicesInitBase,
         });
 
         return server;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_factory is not null)
+        {
+            await _factory.DisposeAsync();
+        }
     }
 }

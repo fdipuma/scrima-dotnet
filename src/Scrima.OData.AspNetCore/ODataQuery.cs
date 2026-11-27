@@ -16,6 +16,9 @@ public sealed class ODataQuery<T> : ODataQuery
     
 public abstract class ODataQuery
 {
+    [FromQuery(Name = "$select")]
+    public string Select { get; internal set; }
+
     [FromQuery(Name = "$filter")]
     public string Filter { get; internal set; }
         
@@ -46,6 +49,13 @@ public abstract class ODataQuery
     public override string ToString()
     {
         var builder = new StringBuilder("?");
+
+        if (Select is not null)
+        {
+            builder.Append("$select=");
+            builder.Append(Select);
+            builder.Append('&');
+        }
 
         if (Filter is not null)
         {

@@ -35,5 +35,5 @@ public sealed class PropertyAccessNode : ValueNode
     /// </summary>
     public override EdmType EdmValueType => Properties.Last().PropertyType;
 
-    public override string ToString() => string.Join(".", Properties);
+    public override string ToString() => string.Join(PropertyPath.Separator, Properties);
 }

@@ -9,6 +9,7 @@ namespace Scrima.OData;
 /// </summary>
 public sealed class ODataRawQueryOptions
 {
+    public const string SelectParamName = "$select";
     public const string FilterParamName = "$filter";
     public const string OrderByParamName = "$orderby";
     public const string SkipParamName = "$skip";
@@ -24,6 +25,7 @@ public sealed class ODataRawQueryOptions
     /// <exception cref="ArgumentNullException">Thrown if raw query is null.</exception>
     public static ODataRawQueryOptions ParseRawQuery(string rawQuery)
     {
+        const string selectFullParam = SelectParamName + "=";
         const string filterFullParam = FilterParamName + "=";
         const string orderByFullParam = OrderByParamName + "=";
         const string skipFullParam = SkipParamName + "=";
@@ -55,7 +57,14 @@ public sealed class ODataRawQueryOptions
                 // Decode the chunks to prevent splitting the query on an '&' which is actually part of a string value
                 var rawQueryOption = Uri.UnescapeDataString(queryOption);
 
-                if (rawQueryOption.StartsWith(filterFullParam, StringComparison.Ordinal))
+                if (rawQueryOption.StartsWith(selectFullParam, StringComparison.Ordinal))
+                {
+                    if (rawQueryOption.Length != selectFullParam.Length)
+                    {
+                        options.Select = rawQueryOption.Substring(selectFullParam.Length);
+                    }
+                }
+                else if (rawQueryOption.StartsWith(filterFullParam, StringComparison.Ordinal))
                 {
                     if (rawQueryOption.Length != filterFullParam.Length)
                     {
@@ -131,6 +140,11 @@ public sealed class ODataRawQueryOptions
     public string Search { get; set; }
 
     /// <summary>
+    /// Gets the raw $select query value from the incoming request Uri if specified.
+    /// </summary>
+    public string Select { get; set; }
+
+    /// <summary>
     /// Gets the raw $skip query value from the incoming request Uri if specified.
     /// </summary>
     public string Skip { get; set; }
@@ -154,7 +168,15 @@ public sealed class ODataRawQueryOptions
     public override string ToString()
     {
         var builder = new StringBuilder();
-            
+
+        if (Select != null)
+        {
+            builder.Append(SelectParamName);
+            builder.Append('=');
+            builder.Append(Select);
+            builder.Append('&');
+        }
+
         if (Filter != null)
         {
             builder.Append(FilterParamName);

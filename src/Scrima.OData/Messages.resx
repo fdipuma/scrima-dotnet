@@ -165,4 +165,7 @@
   <data name="UnableToParseFilter" xml:space="preserve">
     <value>The $filter query option could not be parsed by this service.</value>
   </data>
+  <data name="UnableToParseSelect" xml:space="preserve">
+    <value>The $select query option could not be parsed by this service.</value>
+  </data>
 </root>

@@ -128,6 +128,15 @@ namespace Scrima.OData {
                 return ResourceManager.GetString("UnableToParseFilter", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The $select query option could not be parsed by this service..
+        /// </summary>
+        internal static string UnableToParseSelect {
+            get {
+                return ResourceManager.GetString("UnableToParseSelect", resourceCulture);
+            }
+        }
 
         /// <summary>
         ///   Looks up a localized string similar to The &apos;{0}&apos; operator is not a valid operator..
